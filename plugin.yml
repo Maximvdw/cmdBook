@@ -1,6 +1,6 @@
 name: cmdBook
 main: VdW.Maxim.cmdBook.cmdBook
-version: 1.0.2
+version: 1.1.0
 website: http://dev.bukkit.org/server-mods/cmdBook/
 author: Maximvdw
 description: Execute multiple commands in a book
@@ -20,6 +20,13 @@ permissions:
             cmdbook.edit: true
             cmdbook.create: true
             cmdbook.info: true
+            cmdbook.variable.player: true
+            cmdbook.variable.targetplayer: true
+            cmdbook.variable.health: true
+            cmdbook.variable.xp: true
+            cmdbook.variable.targetxp: true
+            cmdbook.variable.lvl: true
+            cmdbook.variable.targetlvl: true
     cmdbook.help:
         description: Allows a user to see the help menu
         default: true
@@ -35,3 +42,24 @@ permissions:
     cmdbook.info:
         description: Allows a user to see the commands inside a book
         default: op
+    cmdbook.variable.player:
+        description: Allows a user to use the $player variable
+        default: true
+    cmdbook.variable.targetplayer:
+        description: Allows a user to use the $targetplayer variable
+        default: true
+    cmdbook.variable.health:
+        description: Allows a user to use the $health variable
+        default: true
+    cmdbook.variable.xp:
+        description: Allows a user to use the $xp variable
+        default: true
+    cmdbook.variable.targetxp:
+        description: Allows a user to use the $targetxp variable
+        default: true
+    cmdbook.variable.lvl:
+        description: Allows a user to use the $targetxp variable
+        default: true
+    cmdbook.variable.targetlvl:
+        description: Allows a user to use the $targetlvl variable
+        default: true

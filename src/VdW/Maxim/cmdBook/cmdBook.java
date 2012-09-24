@@ -18,10 +18,10 @@ import VdW.Maxim.cmdBook.Metrics;
 public class cmdBook extends JavaPlugin {
 	// Create global variables
 	public final Logger logger = Logger.getLogger("Minecraft"); // Console
-	public static cmdBook plugin; // Plugin will now refer to cmdBook
+	public cmdBook plugin = this; // Plugin will now refer to cmdBook
 	private CommandClass CommandListener; // Wait for commands in a different
 											// class
-	public final PlayerListener pl = new PlayerListener(this); 
+	public final PlayerListener pl = new PlayerListener(this);
 
 	@Override
 	public void onEnable() {
@@ -29,7 +29,7 @@ public class cmdBook extends JavaPlugin {
 		PluginDescriptionFile pdfFile = this.getDescription();
 		String cmdFormat = "[" + pdfFile.getName() + "] ";
 		// --------------------------
-		
+
 		// This function will be started when the plugin is Enabled
 		// Load everything here
 
@@ -38,10 +38,10 @@ public class cmdBook extends JavaPlugin {
 
 		// Start Player listener
 		this.logger.info(cmdFormat + "Starting player listener...");
-	    PluginManager pm = getServer().getPluginManager();
-	    pm.registerEvents(pl, this);
+		PluginManager pm = getServer().getPluginManager();
+		pm.registerEvents(pl, this);
 		this.logger.info(cmdFormat + "Player listener loaded!");
-		
+
 		// Now start Command Listener - This will wait for commands
 		this.logger.info(cmdFormat + "Starting command listener...");
 		CommandListener = new CommandClass(this);
@@ -49,17 +49,25 @@ public class cmdBook extends JavaPlugin {
 		getCommand("cmdbook").setExecutor(CommandListener);
 		getCommand("cb").setExecutor(CommandListener);
 		this.logger.info(cmdFormat + "Command listener loaded!");
-		
+
 		// Load Metrics
 		try {
-		    Metrics metrics = new Metrics(this);
-		    metrics.start();
+			Metrics metrics = new Metrics(this);
+			metrics.start();
 			this.logger.info(cmdFormat + "Metrics Stats loaded!");
 		} catch (IOException e) {
-		    // Failed to submit the stats :-(
+			// Failed to submit the stats :-(
 			this.logger.warning(cmdFormat + "Unable to load Metrics!");
 		}
-		
+
+		// Check for updates
+		this.getServer().getScheduler()
+				.scheduleAsyncDelayedTask(this, new Runnable() {
+					public void run() {
+						updater check = new updater(plugin);
+						check.checkUpdates();
+					}
+				}, 0L);
 	}
 
 	@Override

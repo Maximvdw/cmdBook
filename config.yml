@@ -1,0 +1,10 @@
+# cmdBook - Configuration File
+# Made by: Maxim Van de Wynckel
+# Copyright © 2012
+# -----------------------------
+
+# Allow users to perform chat in a book
+allow_chat: true
+
+# Default command split symbol
+cmd_split: |

@@ -4,7 +4,7 @@ import org.bukkit.conversations.ConversationContext;
 import org.bukkit.conversations.Prompt;
 import org.bukkit.conversations.ValidatingPrompt;
 
-public class inputPromt extends ValidatingPrompt {
+public class inputPlayer extends ValidatingPrompt {
 
 	@Override
 	public String getPromptText(ConversationContext context) {
@@ -13,8 +13,11 @@ public class inputPromt extends ValidatingPrompt {
 
 	@Override
 	protected Prompt acceptValidatedInput(ConversationContext context, String in) {
-		context.setSessionData("data", in);
-		return END_OF_CONVERSATION;
+		 if(!in.equalsIgnoreCase(null)){
+				context.setSessionData("data", in);
+				return END_OF_CONVERSATION; 
+		 }
+		 return this;
 	}
 
 	@Override
