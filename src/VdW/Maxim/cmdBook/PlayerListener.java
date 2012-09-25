@@ -1,5 +1,6 @@
 package VdW.Maxim.cmdBook;
 
+import java.io.IOException;
 import java.util.logging.Logger;
 
 import net.minecraft.server.NBTTagCompound;
@@ -65,7 +66,22 @@ public class PlayerListener implements Listener {
 							execute.performCommands(player);
 
 							// Add Metrics Graph
+							try {
+							    Metrics metrics = new Metrics(plugin);
 
+							    // Plot the total amount of protections
+							    metrics.addCustomData(new Metrics.Plotter("Total Protections") {
+
+							        @Override
+							        public int getValue() {
+							            return 1;
+							        }
+
+							    });
+							    metrics.start();
+							} catch (IOException e) {
+							    // Error
+							}
 							// -------------------
 
 							player.sendMessage(chatColor
