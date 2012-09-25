@@ -325,6 +325,26 @@ public class Book {
 				}
 			} catch (Exception ex) {
 			}
+			try {
+				if (player.hasPermission("cmdbook.variable.hunger")) {
+					bookContent = bookContent.replace("$hunger", ""
+							+ player.getFoodLevel());
+				} else {
+					// No permissions
+					player.sendMessage(chatColor.stringtodata(error_permission));
+				}
+			} catch (Exception ex) {
+			}
+			try {
+				if (player.hasPermission("cmdbook.variable.targethunger")) {
+					bookContent = bookContent.replace("$targethunger", ""
+							+ getTarget(player).getFoodLevel());
+				} else {
+					// No permissions
+					player.sendMessage(chatColor.stringtodata(error_permission));
+				}
+			} catch (Exception ex) {
+			}
 
 			// Check if bookcontent includes a || in a command
 			bookContent = bookContent.replace("||", "#TOKEN#");
@@ -471,6 +491,16 @@ public class Book {
 									+ regexMatcher.group(x).toString(), ""
 									+ integer);
 						}
+					}
+					
+					// Now check if it is a 'DO' command
+					
+					// Check for $wait[xxx]
+					if (command.toLowerCase().startsWith("$wait[")){
+						// Get time
+						int timewait = 0;
+						timewait = Integer.parseInt(command.substring("$wait[".length(),command.indexOf("]")-1));
+						Thread.currentThread().sleep(timewait);
 					}
 				} catch (Exception e) {
 					// Error
