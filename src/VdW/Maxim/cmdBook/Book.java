@@ -13,7 +13,6 @@ import net.minecraft.server.NBTTagCompound;
 import net.minecraft.server.NBTTagList;
 import net.minecraft.server.NBTTagString;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.conversations.Conversation;
@@ -168,8 +167,6 @@ public class Book {
 			return;
 		}
 	}
-
-	public static String inputData = "";
 
 	public void editBook(Player player) {
 		// PUT THIS INTO EVERY METHOD
