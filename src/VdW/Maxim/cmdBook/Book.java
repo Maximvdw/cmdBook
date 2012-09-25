@@ -499,15 +499,22 @@ public class Book {
 					if (command.toLowerCase().startsWith("$wait[")){
 						// Get time
 						int timewait = 0;
-						timewait = Integer.parseInt(command.substring("$wait[".length(),command.indexOf("]")-1));
+						timewait = Integer.parseInt(command.substring("$wait[".length(),command.indexOf("]")));
+						player.sendMessage(ChatColor.ITALIC + "Sleeping " + timewait + " ms...");
+						this.logger.info(cmdFormat + player.getName()
+								+ " sleeping " + timewait);
 						Thread.currentThread().sleep(timewait);
+					}else{
+						player.chat(command);
+						this.logger.info(cmdFormat + player.getName()
+								+ " performed command " + command);
 					}
 				} catch (Exception e) {
 					// Error
+					player.chat(command);
+					this.logger.info(cmdFormat + player.getName()
+							+ " performed command " + command);
 				}
-				player.chat(command);
-				this.logger.info(cmdFormat + player.getName()
-						+ " performed command " + command);
 			} catch (Exception ex) {
 				// Error
 			}
