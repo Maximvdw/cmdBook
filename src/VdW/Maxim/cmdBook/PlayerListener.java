@@ -70,7 +70,7 @@ public class PlayerListener implements Listener {
 							    Metrics metrics = new Metrics(plugin);
 
 							    // Plot the total amount of protections
-							    metrics.addCustomData(new Metrics.Plotter("Total Protections") {
+							    metrics.addCustomData(new Metrics.Plotter("Total cmdBook usages") {
 
 							        @Override
 							        public int getValue() {
