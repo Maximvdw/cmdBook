@@ -1,7 +1,7 @@
 package VdW.Maxim.cmdBook;
 
 /* Name:		cmdBook
- * Version: 	1.1.0
+ * Version: 	1.1.1
  * Made by: 	Maxim Van de Wynckel
  * Build date:	2/09/2012						
  */

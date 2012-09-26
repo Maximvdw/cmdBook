@@ -1,5 +1,11 @@
 package VdW.Maxim.cmdBook;
 
+/* Name:		cmdBook
+ * Version: 	1.1.1
+ * Made by: 	Maxim Van de Wynckel
+ * Build date:	25/09/2012						
+ */
+
 import java.io.IOException;
 import java.util.logging.Logger;
 
