@@ -46,8 +46,13 @@ public class cmdBook extends JavaPlugin {
 		this.logger.info(cmdFormat + "Starting command listener...");
 		CommandListener = new CommandClass(this);
 		// List all commands that have to be heard by the Command Listener
-		getCommand("cmdbook").setExecutor(CommandListener);
-		getCommand("cb").setExecutor(CommandListener);
+		try{
+			getCommand("cmdbook").setExecutor(CommandListener); // Might be used by CommandBook
+			getCommand("cb").setExecutor(CommandListener);	
+		}catch (Exception ex){
+			// Error while enabling the commands
+			// Do not show this cuz its a compatibility bug
+		}
 		this.logger.info(cmdFormat + "Command listener loaded!");
 
 		// Load Metrics
