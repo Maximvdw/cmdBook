@@ -27,6 +27,10 @@ permissions:
             cmdbook.variable.targetxp: true
             cmdbook.variable.lvl: true
             cmdbook.variable.targetlvl: true
+            cmdbook.variable.hunger: true
+            cmdbook.variable.targethunger: true
+            cmdbook.variable.killer: true
+            cmdbook.variable.targetkiller: true
     cmdbook.help:
         description: Allows a user to see the help menu
         default: true
@@ -62,4 +66,16 @@ permissions:
         default: true
     cmdbook.variable.targetlvl:
         description: Allows a user to use the $targetlvl variable
+        default: true
+    cmdbook.variable.hunger:
+        description: Allows a user to use the $hunger variable
+        default: true
+    cmdbook.variable.targethunger:
+        description: Allows a user to use the $targethunger variable
+        default: true
+    cmdbook.variable.killer:
+        description: Allows a user to use the $killer variable
+        default: true
+    cmdbook.variable.targetkiller:
+        description: Allows a user to use the $targetkiller variable
         default: true

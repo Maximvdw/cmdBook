@@ -47,8 +47,8 @@ public class cmdBook extends JavaPlugin {
 		CommandListener = new CommandClass(this);
 		// List all commands that have to be heard by the Command Listener
 		try{
-			getCommand("cmdbook").setExecutor(CommandListener); // Might be used by CommandBook
 			getCommand("cb").setExecutor(CommandListener);	
+			getCommand("cmdbook").setExecutor(CommandListener); // Might be used by CommandBook
 		}catch (Exception ex){
 			// Error while enabling the commands
 			// Do not show this cuz its a compatibility bug

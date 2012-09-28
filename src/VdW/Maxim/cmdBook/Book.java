@@ -345,6 +345,26 @@ public class Book {
 				}
 			} catch (Exception ex) {
 			}
+			try {
+				if (player.hasPermission("cmdbook.variable.killer")) {
+					bookContent = bookContent.replace("$killer", ""
+							+ player.getKiller());
+				} else {
+					// No permissions
+					player.sendMessage(chatColor.stringtodata(error_permission));
+				}
+			} catch (Exception ex) {
+			}
+			try {
+				if (player.hasPermission("cmdbook.variable.targetkiller")) {
+					bookContent = bookContent.replace("$targetkiller", ""
+							+ player.getKiller());
+				} else {
+					// No permissions
+					player.sendMessage(chatColor.stringtodata(error_permission));
+				}
+			} catch (Exception ex) {
+			}
 
 			// Check if bookcontent includes a || in a command
 			bookContent = bookContent.replace("||", "#TOKEN#");
