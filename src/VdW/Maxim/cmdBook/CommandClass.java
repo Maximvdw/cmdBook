@@ -47,8 +47,7 @@ public class CommandClass implements CommandExecutor {
 		// Check if the player entered a valid command (Only mcrss or rss are
 		// allowed)
 		// This class will only check for the first row of Arguments
-		if (cmdLabel.equalsIgnoreCase("cmdbook")
-				|| cmdLabel.equalsIgnoreCase("cb")) {
+		if (cmdLabel.equalsIgnoreCase("cb")) {
 			// Check if any arguments are given
 			if (args.length == 0) {
 				// No arguments given

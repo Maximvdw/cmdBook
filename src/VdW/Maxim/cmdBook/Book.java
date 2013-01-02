@@ -8,10 +8,11 @@ import java.util.regex.Pattern;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import java.util.*;
 
-import net.minecraft.server.NBTTagCompound;
-import net.minecraft.server.NBTTagList;
-import net.minecraft.server.NBTTagString;
+import net.minecraft.server.v1_4_6.NBTTagCompound;
+import net.minecraft.server.v1_4_6.NBTTagList;
+import net.minecraft.server.v1_4_6.NBTTagString;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -19,16 +20,17 @@ import org.bukkit.conversations.Conversation;
 import org.bukkit.conversations.ConversationAbandonedEvent;
 import org.bukkit.conversations.ConversationAbandonedListener;
 import org.bukkit.conversations.ConversationFactory;
-import org.bukkit.craftbukkit.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_4_6.inventory.CraftItemStack;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginDescriptionFile;
 
 import VdW.Maxim.cmdBook.cmdBook;
 
 /* Name:		cmdBook
- * Version: 	1.1.1
+ * Version: 	1.2.0
  * Made by: 	Maxim Van de Wynckel
  * Build date:	2/09/2012						
  */
@@ -77,8 +79,7 @@ public class Book {
 		CraftItemStack stack = (CraftItemStack) player.getItemInHand();
 		if (stack.getTypeId() == 387) {
 			// check if the valid yet
-			net.minecraft.server.ItemStack nmsStack = stack.getHandle();
-			NBTTagCompound tag = nmsStack.getTag();
+			NBTTagCompound tag = CraftItemStack.asNMSCopy((ItemStack)(stack)).getTag();
 			String authorPlugin = (ChatColor.RED + "cmdBook").toString();
 			String[] pageContent = getBookContent(player);
 			if (pageContent[0].toLowerCase().startsWith("[cmdbook]")
@@ -116,9 +117,8 @@ public class Book {
 			}
 
 			// Show commands in the book
-			CraftItemStack inHand = (CraftItemStack) player.getItemInHand();
-			nmsStack = inHand.getHandle();
-			tag = nmsStack.getTag();
+			ItemStack inHand = (ItemStack) player.getItemInHand();
+			tag = CraftItemStack.asNMSCopy((ItemStack)(stack)).getTag();
 			player.sendMessage(chatColor.stringtodata(cmdbook_info
 					+ tag.getString("title") + "\n" + commandList));
 		}else{
@@ -137,7 +137,7 @@ public class Book {
 		// In order to edit a book, the book has to
 		// be unsigned, so it can be used for editing again
 		// Get the item
-		CraftItemStack stack = (CraftItemStack) player.getItemInHand();
+		ItemStack stack = (ItemStack) player.getItemInHand();
 		if (stack.getTypeId() == 386) {
 			// The book is not signed yet
 			// Warn player
@@ -158,9 +158,10 @@ public class Book {
 				return;
 			}
 			// Change data of book
-			CraftItemStack book = (CraftItemStack) player.getItemInHand();
-			book.getHandle().getTag()
-					.setString("author", ChatColor.RED + "cmdBook");
+			ItemStack is = player.getItemInHand();
+			BookMeta book = (BookMeta) is.getItemMeta();
+			book.setAuthor(ChatColor.RED + "cmdBook");
+			is.setItemMeta(book);
 		} else {
 			// The player in not holding a book
 			player.sendMessage(chatColor.stringtodata(error_nobook));
@@ -179,23 +180,22 @@ public class Book {
 		// if it is a valid cmdBook
 
 		// Get the item the player has in his hand
-		CraftItemStack inHand = (CraftItemStack) player.getItemInHand();
+		ItemStack is = (ItemStack) player.getItemInHand();
+		BookMeta book = (BookMeta) is.getItemMeta();
+		
 		// Check if the player is holding a book
-		if (inHand.getTypeId() == 387) {
+		if (is.getTypeId() == 387) {
 			// Player is holding a book
 			// Now check if it is a cmdBook
 			Book check = new Book(plugin);
 			String[] pageContent = check.getBookContent(player);
 
 			// Now read author
-			net.minecraft.server.ItemStack nmsStack = inHand.getHandle();
-			NBTTagCompound tag = nmsStack.getTag();
-
 			String authorPlugin = (ChatColor.RED + "cmdBook").toString(); // The
 																			// cmdBook
 			// author
 			if (pageContent[0].toLowerCase().startsWith("[cmdbook]")
-					& tag.get("author").toString()
+					& book.getAuthor()
 							.equalsIgnoreCase(authorPlugin)) {
 				// It is a cmdBook
 				// Now check if the player has permission
@@ -203,12 +203,12 @@ public class Book {
 				if (player.hasPermission("cmdbook.edit")) {
 					// Player has permisions
 					// Unsign the book
-					ItemStack is = player.getItemInHand();
-					CraftItemStack cis = (CraftItemStack) is;
-					NBTTagCompound tc = cis.getHandle().getTag();
+					is = player.getItemInHand();
+					book = (BookMeta) is.getItemMeta();
 					is.setType(Material.BOOK_AND_QUILL);
-					tc.remove("author");
-					tc.remove("title");
+					book.setAuthor("");
+					book.setTitle("");
+					is.setItemMeta(book);
 					// Book unsigned
 					this.logger.info(cmdFormat + player.getName()
 							+ " unsigned a cmdBook!");
@@ -562,10 +562,9 @@ public class Book {
 		try {
 			// Get the item the player has in his hand
 			CraftItemStack stack = (CraftItemStack) player.getItemInHand();
-			net.minecraft.server.ItemStack nmsStack = stack.getHandle();
 
 			// Now read each page content
-			NBTTagCompound tag = nmsStack.getTag();
+			NBTTagCompound tag = CraftItemStack.asNMSCopy((ItemStack)(stack)).getTag();
 			NBTTagList pagesTag = tag.getList("pages");
 			pageContents = new String[pagesTag.size()]; // Dynamically change
 														// the size

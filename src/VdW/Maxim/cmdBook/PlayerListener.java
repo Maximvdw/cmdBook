@@ -1,18 +1,16 @@
 package VdW.Maxim.cmdBook;
 
 /* Name:		cmdBook
- * Version: 	1.1.1
+ * Version: 	1.2.0
  * Made by: 	Maxim Van de Wynckel
- * Build date:	25/09/2012						
+ * Build date:	03/01/2012						
  */
 
 import java.io.IOException;
 import java.util.logging.Logger;
-
-import net.minecraft.server.NBTTagCompound;
-
 import org.bukkit.ChatColor;
-import org.bukkit.craftbukkit.inventory.CraftItemStack;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -35,13 +33,16 @@ public class PlayerListener implements Listener {
 		plugin = cmdBook;
 	}
 
+	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		final Player player = event.getPlayer();
 		// Get the item the player has in his hand
-		CraftItemStack inHand = (CraftItemStack) player.getItemInHand();
+		ItemStack is = player.getItemInHand();
+		BookMeta book = (BookMeta) is.getItemMeta();
+		
 		// Check if the player is holding a book
-		if (inHand.getTypeId() == 387
+		if (is.getTypeId() == 387
 				& (event.getAction() == Action.LEFT_CLICK_AIR || event
 						.getAction() == Action.LEFT_CLICK_BLOCK)) {
 			// Player is holding a book
@@ -50,14 +51,11 @@ public class PlayerListener implements Listener {
 			String[] pageContent = check.getBookContent(player);
 
 			// Now read author
-			net.minecraft.server.ItemStack nmsStack = inHand.getHandle();
-			NBTTagCompound tag = nmsStack.getTag();
-
 			String authorPlugin = (ChatColor.RED + "cmdBook").toString(); // The
 																			// cmdBook
 			// author
 			if (pageContent[0].toLowerCase().startsWith("[cmdbook]")
-					& tag.get("author").toString()
+					& book.getAuthor()
 							.equalsIgnoreCase(authorPlugin)) {
 				// It is a cmdBook
 				// Now check if the player has permission
