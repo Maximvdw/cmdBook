@@ -6,9 +6,9 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
-import java.util.*;
 
 import net.minecraft.server.v1_4_6.NBTTagCompound;
 import net.minecraft.server.v1_4_6.NBTTagList;
@@ -27,12 +27,14 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 
+import com.mysql.jdbc.log.Log;
+
 import VdW.Maxim.cmdBook.cmdBook;
 
 /* Name:		cmdBook
- * Version: 	1.2.0
+ * Version: 	1.3.0
  * Made by: 	Maxim Van de Wynckel
- * Build date:	2/09/2012						
+ * Build date:	10/01/2013						
  */
 
 public class Book {
@@ -118,7 +120,7 @@ public class Book {
 
 			// Show commands in the book
 			ItemStack inHand = (ItemStack) player.getItemInHand();
-			tag = CraftItemStack.asNMSCopy((ItemStack)(stack)).getTag();
+			tag = CraftItemStack.asNMSCopy((ItemStack)(inHand)).getTag();
 			player.sendMessage(chatColor.stringtodata(cmdbook_info
 					+ tag.getString("title") + "\n" + commandList));
 		}else{
@@ -161,6 +163,7 @@ public class Book {
 			ItemStack is = player.getItemInHand();
 			BookMeta book = (BookMeta) is.getItemMeta();
 			book.setAuthor(ChatColor.RED + "cmdBook");
+			book.setTitle(ChatColor.UNDERLINE + book.getTitle());
 			is.setItemMeta(book);
 		} else {
 			// The player in not holding a book
@@ -365,6 +368,76 @@ public class Book {
 				}
 			} catch (Exception ex) {
 			}
+			try {
+				if (player.hasPermission("cmdbook.variable.xpos")) {
+					bookContent = bookContent.replace("$xpos", ""
+							+ player.getLocation().getX());
+				} else {
+					// No permissions
+					player.sendMessage(chatColor.stringtodata(error_permission));
+				}
+			} catch (Exception ex) {
+			}
+			try {
+				if (player.hasPermission("cmdbook.variable.ypos")) {
+					bookContent = bookContent.replace("$ypos", ""
+							+ player.getLocation().getY());
+				} else {
+					// No permissions
+					player.sendMessage(chatColor.stringtodata(error_permission));
+				}
+			} catch (Exception ex) {
+			}
+			try {
+				if (player.hasPermission("cmdbook.variable.targetxpos")) {
+					bookContent = bookContent.replace("$targetxpos", ""
+							+ getTarget(player).getLocation().getX());
+				} else {
+					// No permissions
+					player.sendMessage(chatColor.stringtodata(error_permission));
+				}
+			} catch (Exception ex) {
+			}
+			try {
+				if (player.hasPermission("cmdbook.variable.targetypos")) {
+					bookContent = bookContent.replace("$targetypos", ""
+							+ getTarget(player).getLocation().getY());
+				} else {
+					// No permissions
+					player.sendMessage(chatColor.stringtodata(error_permission));
+				}
+			} catch (Exception ex) {
+			}
+			try {
+				if (player.hasPermission("cmdbook.variable.losx")) {
+					bookContent = bookContent.replace("$losx", ""
+							+ player.getTargetBlock(null, 200).getX());
+				} else {
+					// No permissions
+					player.sendMessage(chatColor.stringtodata(error_permission));
+				}
+			} catch (Exception ex) {
+			}
+			try {
+				if (player.hasPermission("cmdbook.variable.losy")) {
+					bookContent = bookContent.replace("$losy", ""
+							+ player.getTargetBlock(null, 200).getY());
+				} else {
+					// No permissions
+					player.sendMessage(chatColor.stringtodata(error_permission));
+				}
+			} catch (Exception ex) {
+			}
+			try {
+				if (player.hasPermission("cmdbook.variable.losz")) {
+					bookContent = bookContent.replace("$losz", ""
+							+ player.getTargetBlock(null, 200).getZ());
+				} else {
+					// No permissions
+					player.sendMessage(chatColor.stringtodata(error_permission));
+				}
+			} catch (Exception ex) {
+			}
 
 			// Check if bookcontent includes a || in a command
 			bookContent = bookContent.replace("||", "#TOKEN#");
@@ -391,7 +464,7 @@ public class Book {
 				if (bookContent.charAt(j - 1) == seperator
 						|| bookContent.length() == j) {
 					// Execute command
-					try {
+					try{
 						// Check for calculations
 						String command = bookContent.substring((j - count), j)
 								.replace("|", "");
@@ -487,29 +560,37 @@ public class Book {
 		}
 
 		// Now execute all of those commands
-		for (int i = 0; i < cmd_list.length; i++) {
+		for (int i = 0; i < cmd_list.length-1; i++) {
 			try {
 				String command = cmd_list[i];
 				try {
 					// Check for calculations
 					ScriptEngineManager mgr = new ScriptEngineManager();
-					ScriptEngine engine = mgr.getEngineByName("JavaScript");
-					Pattern regex = Pattern.compile("calc(.*)");
+					ScriptEngine engine = mgr.getEngineByName("javascript");
+					Pattern regex = Pattern.compile("calc\\((.*?)\\)");
 					Matcher regexMatcher = regex.matcher(command);
+					String strCalc = "";
 					while (regexMatcher.find()) {
 						for (int x = 1; x <= regexMatcher.groupCount(); x++) {
-							// matched text: regexMatcher.group(i)
-							// match start: regexMatcher.start(i)
-							// match end: regexMatcher.end(i)
-							String strCalc = regexMatcher.group(x)
-									.toLowerCase().replace("(", "");
-							strCalc = strCalc.replace(")", "");
-							double d = Double.parseDouble(engine.eval(strCalc)
-									+ "");
-							int integer = (int) d;
-							command = command.replace("calc"
-									+ regexMatcher.group(x).toString(), ""
-									+ integer);
+							try{
+								// matched text: regexMatcher.group(i)
+								// match start: regexMatcher.start(i)
+								// match end: regexMatcher.end(i)
+								engine.getBindings(ScriptContext.ENGINE_SCOPE);
+								strCalc = regexMatcher.group(x)
+										.toLowerCase().replace("(", "");
+								strCalc = strCalc.replace(")", "");
+								plugin.logger.info(strCalc);
+								plugin.logger.info(regexMatcher.group(x).toString());
+								double d = Double.parseDouble(engine.eval(strCalc)
+										+ "");
+								int integer = (int) d;
+								command = command.replace("calc("
+										+ regexMatcher.group(x).toString() + ")", ""
+										+ integer);	
+							}catch (Exception ex){
+								player.sendMessage(chatColor.stringtodata("&cThe calculation '" + strCalc + "' could not be made!"));
+							}
 						}
 					}
 					
@@ -533,10 +614,13 @@ public class Book {
 					// Error
 					player.chat(command);
 					this.logger.info(cmdFormat + player.getName()
-							+ " performed command " + command);
+							+ " performed command* " + command);
+					e.printStackTrace();
 				}
 			} catch (Exception ex) {
 				// Error
+				this.logger.info(cmdFormat + player.getName()
+						+ " - Error while executing command!");
 			}
 		}
 	}

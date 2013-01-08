@@ -30,6 +30,7 @@ public class help extends JavaPlugin {
 			"&a/cb create&f - Create a cmdBook with the book you are holding\n" +
 			"&a/cb edit&f - Edit the commands in the book\n" + 
 			"&a/cb info&f - List all commands in the book\n" +
+			"&a/cb private&f - Make your normal book private\n" +
 			"&a/cb about&f - Show more information about the plugin";
 	static String cmdbook_about_str = "&6----------[ cmdBook About ]----------\n" +
 			"&6Name: cmdBook - Execute multiple commands\n" +

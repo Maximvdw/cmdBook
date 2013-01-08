@@ -66,14 +66,14 @@ public class cmdBook extends JavaPlugin {
 			this.logger.warning(cmdFormat + "Unable to load Metrics!");
 		}
 
-		// Check for updates
+		/* Check for updates
 		this.getServer().getScheduler()
 				.scheduleAsyncDelayedTask(this, new Runnable() {
 					public void run() {
 						updater check = new updater(plugin);
 						check.checkUpdates();
 					}
-				}, 0L);
+				}, 0L);*/
 	}
 
 	@Override

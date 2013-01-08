@@ -8,10 +8,13 @@ package VdW.Maxim.cmdBook;
 
 import java.util.logging.Logger;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 
 public class CommandClass implements CommandExecutor {
 	// Create global variables
@@ -63,6 +66,12 @@ public class CommandClass implements CommandExecutor {
 					// Show HELP
 					help help = new help(plugin);
 					help.cmdbook_help(player);
+				} else if (argument.equalsIgnoreCase("private")) {
+					// Make the book private
+					ItemStack is = player.getItemInHand();
+					BookMeta book = (BookMeta) is.getItemMeta();
+					book.setDisplayName(ChatColor.BLUE + book.getTitle());
+				    is.setItemMeta(book);
 				} else if (argument.equalsIgnoreCase("create")) {
 					// Create a cmdBook
 					// Check if it is a player and has permissions

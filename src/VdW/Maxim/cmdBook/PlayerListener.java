@@ -24,9 +24,11 @@ public class PlayerListener implements Listener {
 
 	// Error messages (Handy for other languages)
 	static String error_permission = "&cYou do not have permission!";
+	static String error_noread = "&cYou cannot read a &4cmdBook&c!";
 
 	// Confirm messages (Handy for other languages)
 	static String confirm_commandsperformed = "&acmdBook Commands performed!";
+	static String confirm_opening = "&aThis book is protected!";
 
 	// Get arguments from main class
 	public PlayerListener(cmdBook cmdBook) {
@@ -94,7 +96,33 @@ public class PlayerListener implements Listener {
 					}, 0L);
 				} else {
 					// No permission
+					player.closeInventory();
 					player.sendMessage(chatColor.stringtodata(error_permission));
+				}
+			}
+		}else if (is.getTypeId() == 387
+				& (event.getAction() == Action.RIGHT_CLICK_AIR || event
+				.getAction() == Action.RIGHT_CLICK_BLOCK)) {
+			// Player is holding a book
+						// Now check if it is a cmdBook
+						Book check = new Book(plugin);
+						String[] pageContent = check.getBookContent(player);
+
+						// Now read author
+						String authorPlugin = (ChatColor.RED + "cmdBook").toString(); // The
+																						// cmdBook
+			if (pageContent[0].toLowerCase().startsWith("[cmdbook]")
+					& book.getAuthor()
+							.equalsIgnoreCase(authorPlugin)) {
+				player.sendMessage(chatColor.stringtodata(error_noread));
+				player.closeInventory();
+			}else{
+				if (book.getAuthor() == player.getName() && book.getDisplayName().startsWith(ChatColor.BLUE + "") || player.hasPermission("cmdbook.readall"))
+				{
+					player.sendMessage(chatColor.stringtodata(confirm_opening));
+				}else if (book.getAuthor() != player.getName()){
+					player.sendMessage(chatColor.stringtodata(error_permission));
+					player.closeInventory();
 				}
 			}
 		}
