@@ -12,6 +12,7 @@ permissions:
         description: Gives access to all cmdBook commands
         default: op
         children:
+            cmdbook.use: true
             cmdbook.about: true
             cmdbook.help: true
             cmdbook.edit: true
@@ -32,7 +33,20 @@ permissions:
             cmdbook.variable.ypos: true
             cmdbook.variable.targetxpos: true
             cmdbook.variable.targetypos: true
+            cmdbook.variable.losx: true
+            cmdbook.variable.losy: true
+            cmdbook.variable.losz: true
             cmdbook.readall: true
+            cmdbook.private.own: true
+            cmdbook.public.own: true
+            cmdbook.private.all: true
+            cmdbook.public.all: true
+            cmdbook.variable.runconsole: true
+            cmdbook.variable.hidemessages: true
+            cmdbook.reload: true
+    cmdbook.use:
+        description: Allows a user to use a cmdBook
+        default: true
     cmdbook.help:
         description: Allows a user to see the help menu
         default: true
@@ -93,6 +107,36 @@ permissions:
     cmdbook.variable.targetypos:
         description: Gets your targets Ypos
         default: true
+    cmdbook.variable.losx:
+        description: Gets the location (x) of the block you are looking at
+        default: true
+    cmdbook.variable.losy:
+        description: Gets the location (y) of the block you are looking at
+        default: true
+    cmdbook.variable.losz:
+        description: Gets the location (z) of the block you are looking at
+        default: true
+    cmdbook.variable.runconsole:
+        description: Let the console run the commands
+        default: op
+    cmdbook.variable.hidemessages:
+        description: Hide cmdBook messages
+        default: op
     cmdbook.readall:
         description: Lets you read all protected books
+        default: op
+    cmdbook.private.own:
+        description: Lets a user private his own book
+        default: true
+    cmdbook.public.own:
+        description: Lets a user unprivate his own book
+        default: true
+    cmdbook.private.all:
+        description: Lets a user private all books
+        default: op
+    cmdbook.public.all:
+        description: Lets a user unprivate all books
+        default: op
+    cmdbook.reload:
+        description: Reload configuration
         default: op

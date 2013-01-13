@@ -1,5 +1,6 @@
 package VdW.Maxim.cmdBook;
 
+import java.io.Console;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -26,8 +27,6 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
-
-import com.mysql.jdbc.log.Log;
 
 import VdW.Maxim.cmdBook.cmdBook;
 
@@ -57,6 +56,7 @@ public class Book {
 	// Confirm messages (Handy for other languages)
 	static String confirm_bookcreated = "&aYour cmdBook has been created!";
 	static String confirm_unsigned = "&aYour cmdBook has been unsigned!";
+	static String confirm_commandsperformed = "&acmdBook Commands performed!";
 
 	// Other messages (Handy for other languages)
 	static String variable_inputquestion = "&f[cmdBook] &aInput: ";
@@ -211,6 +211,7 @@ public class Book {
 					is.setType(Material.BOOK_AND_QUILL);
 					book.setAuthor("");
 					book.setTitle("");
+					book.setDisplayName("");
 					is.setItemMeta(book);
 					// Book unsigned
 					this.logger.info(cmdFormat + player.getName()
@@ -249,6 +250,8 @@ public class Book {
 		answer = "";
 		char seperator = '|';
 		String bookContent = "";
+		boolean runConsole = false;
+		boolean hideMessages = false;
 		int cmd_counter = 0;
 		int counter = 0;
 		String[] cmd_list = null;
@@ -258,6 +261,24 @@ public class Book {
 			bookContent = pageContents[i].replace("\n", "");
 
 			// Now replace the shortcuts in Bookcontent
+			try {
+				if (player.hasPermission("cmdbook.variable.runconsole")) {
+					if (bookContent.toLowerCase().contains("@runconsole")){
+						runConsole = true;
+					}
+				}
+				bookContent = bookContent.replace("@runconsole","");	
+			} catch (Exception ex) {
+			}
+			try {
+				if (player.hasPermission("cmdbook.variable.hidemessages")) {
+					if (bookContent.toLowerCase().contains("@hidemessages")){
+						hideMessages = true;
+					}
+				}
+				bookContent = bookContent.replace("@hidemessages","");	
+			} catch (Exception ex) {
+			}
 			try {
 				if (player.hasPermission("cmdbook.variable.player")) {
 					bookContent = bookContent.replace("$player",
@@ -447,6 +468,7 @@ public class Book {
 				if (bookContent.charAt(j - 1) == seperator
 						|| bookContent.length() == j) {
 					cmd_counter += 1;
+					plugin.logger.info(cmdFormat + "Found " + cmd_counter + " commands in " + player.getName() + "'s cmdBook");
 				}
 			}
 
@@ -530,6 +552,7 @@ public class Book {
 
 							if (answer == "/abort") {
 								// Abort
+								answer = "";
 								break;
 							}
 
@@ -601,20 +624,55 @@ public class Book {
 						// Get time
 						int timewait = 0;
 						timewait = Integer.parseInt(command.substring("$wait[".length(),command.indexOf("]")));
-						player.sendMessage(ChatColor.ITALIC + "Sleeping " + timewait + " ms...");
+						if (player.hasPermission("cmdbook.variable.hidemessages") && hideMessages == true)
+						{
+							// Thats the point.. nothing :D
+						}else{
+							player.sendMessage(ChatColor.ITALIC + "Sleeping " + timewait + " ms...");	
+						}
 						this.logger.info(cmdFormat + player.getName()
 								+ " sleeping " + timewait);
 						Thread.currentThread().sleep(timewait);
 					}else{
-						player.chat(command);
-						this.logger.info(cmdFormat + player.getName()
-								+ " performed command " + command);
+						if (command.startsWith("/"))
+						{
+							if (player.hasPermission("cmdbook.variable.runconsole") && runConsole == true)
+							{
+								plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command.substring(1));
+								this.logger.info(cmdFormat + player.getName()
+										+ " let the console perform command " + command);	
+							}else{
+								player.chat(command);
+								this.logger.info(cmdFormat + player.getName()
+										+ " performed command " + command);	
+							}
+						}else if (!command.startsWith("/") && plugin.allowChat == true)
+						{
+							if (player.hasPermission("cmdbook.variable.runconsole") && runConsole == true)
+							{
+								plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), command);
+								this.logger.info(cmdFormat + player.getName()
+										+ " let the console perform command " + command);	
+							}else{
+								player.chat(command);
+								this.logger.info(cmdFormat + player.getName()
+										+ " performed chat " + command);
+							}
+						}
 					}
 				} catch (Exception e) {
 					// Error
-					player.chat(command);
-					this.logger.info(cmdFormat + player.getName()
-							+ " performed command* " + command);
+					if (command.startsWith("/"))
+					{
+						player.chat(command);
+						this.logger.info(cmdFormat + player.getName()
+								+ " performed command " + command);
+					}else if (!command.startsWith("/") && plugin.allowChat == true)
+					{
+						player.chat(command);
+						this.logger.info(cmdFormat + player.getName()
+								+ " performed chat " + command);
+					}
 					e.printStackTrace();
 				}
 			} catch (Exception ex) {
@@ -622,6 +680,14 @@ public class Book {
 				this.logger.info(cmdFormat + player.getName()
 						+ " - Error while executing command!");
 			}
+		}
+		if (player.hasPermission("cmdbook.variable.hidemessages") && hideMessages == true)
+		{
+			// Thats the point.. nothing :D
+		}else{
+			// Complete
+			player.sendMessage(chatColor
+					.stringtodata(confirm_commandsperformed));
 		}
 	}
 

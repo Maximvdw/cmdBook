@@ -8,3 +8,7 @@ allow_chat: true
 
 # Default command split symbol
 cmd_split: |
+
+# Check for updates
+# This will use dev.bukkit.org to check for cmdBook updates
+checkUpdates: true

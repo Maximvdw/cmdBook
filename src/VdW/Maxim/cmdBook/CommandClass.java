@@ -8,7 +8,10 @@ package VdW.Maxim.cmdBook;
 
 import java.util.logging.Logger;
 
+import net.minecraft.server.v1_4_6.Item;
+
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -30,6 +33,14 @@ public class CommandClass implements CommandExecutor {
 	static String error_permission = "&cYou do not have permission!";
 	static String error_console = "This function is only available ingame!";
 	static String error_unknowncommand = "&cUnknown command!\n&cType &4/cb help&c for the available commands.";
+	static String error_nobook = "&cYou can only use this command on a Written book!";
+	static String error_noauthor = "&cOnly the author of this book can protect it!";
+	static String error_noauthor2 = "&cOnly the author of this book can make it public!";
+	
+	// Confirm messages
+	static String confirm_private ="&aYour book has been made private!";
+	static String confirm_unprivate = "&2Your book has been made public!";
+	static String confirm_reloaded = "&2[&fcmdBook$2] &aReload complete!";
 
 	public boolean onCommand(CommandSender sender, Command cmd,
 			String cmdLabel, String[] args) {
@@ -66,12 +77,90 @@ public class CommandClass implements CommandExecutor {
 					// Show HELP
 					help help = new help(plugin);
 					help.cmdbook_help(player);
+				} else if (argument.equalsIgnoreCase("public")) {
+					// Make the book unprivate
+					try{
+						if (player == null) {
+							// Console cannot create a book
+							this.logger.warning(chatColor.stringtodata(error_console));
+						} else {
+							ItemStack is = player.getItemInHand();
+
+							// Check if the player is holding a book
+							if (is.getTypeId() == 387)
+							{
+								BookMeta book = (BookMeta) is.getItemMeta();
+								if (book.getAuthor() == player.getName() || player.hasPermission("cmdbook.public.all"))
+								{
+									if (player.hasPermission("cmdbook.public.own"))
+									{
+										book.setDisplayName(ChatColor.RESET + book.getTitle());
+									    is.setItemMeta(book);
+									    player.sendMessage(chatColor.stringtodata(confirm_unprivate));	
+									}
+								}else{
+									// Player is not the author
+									player.sendMessage(chatColor.stringtodata(error_noauthor2));
+								}
+							}else{
+								// No book
+								player.sendMessage(chatColor.stringtodata(error_nobook));
+							}
+						}
+					}catch(Exception ex){
+						
+					}
 				} else if (argument.equalsIgnoreCase("private")) {
 					// Make the book private
-					ItemStack is = player.getItemInHand();
-					BookMeta book = (BookMeta) is.getItemMeta();
-					book.setDisplayName(ChatColor.BLUE + book.getTitle());
-				    is.setItemMeta(book);
+					try{
+						if (player == null) {
+							// Console cannot create a book
+							this.logger.warning(chatColor.stringtodata(error_console));
+						} else {
+							ItemStack is = player.getItemInHand();
+
+							// Check if the player is holding a book
+							if (is.getTypeId() == 387)
+							{
+								BookMeta book = (BookMeta) is.getItemMeta();
+								if ((book.getAuthor() == player.getName() )|| player.hasPermission("cmdbook.private.all"))
+								{
+									if (player.hasPermission("cmdbook.private.own"))
+									{
+										book.setDisplayName(ChatColor.BLUE + book.getTitle());
+									    is.setItemMeta(book);
+									    player.sendMessage(chatColor.stringtodata(confirm_private));
+									}
+								}else{
+									// Player is not the author
+									player.sendMessage(chatColor.stringtodata(error_noauthor));
+								}
+							}else{
+								// No book
+								player.sendMessage(chatColor.stringtodata(error_nobook));
+							}
+						}
+					}catch(Exception ex){
+						
+					}
+				} else if (argument.equalsIgnoreCase("reload")) {
+					// Reload configuration
+					if (player == null) {
+						Configuration cfg = new Configuration(plugin);
+						cfg.loadYamls();
+						logger.info(chatColor.stringtoconsole(confirm_reloaded));
+					}else{
+						if (player.hasPermission("cmdbook.reload"))
+						{
+							Configuration cfg = new Configuration(plugin);
+							cfg.loadYamls();
+							player.sendMessage(chatColor.stringtodata(confirm_reloaded));
+						}else{
+							// No permission
+							player.sendMessage(chatColor
+									.stringtodata(error_permission));
+						}
+					}
 				} else if (argument.equalsIgnoreCase("create")) {
 					// Create a cmdBook
 					// Check if it is a player and has permissions

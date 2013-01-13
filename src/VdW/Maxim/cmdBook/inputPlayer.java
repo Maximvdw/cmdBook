@@ -1,9 +1,9 @@
 package VdW.Maxim.cmdBook;
 
 /* Name:		cmdBook
- * Version: 	1.1.1
+ * Version: 	1.3.0
  * Made by: 	Maxim Van de Wynckel
- * Build date:	25/09/2012						
+ * Build date:	10/01/2013						
  */
 
 import org.bukkit.conversations.ConversationContext;

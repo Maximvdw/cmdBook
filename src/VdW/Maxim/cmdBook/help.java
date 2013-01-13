@@ -31,7 +31,9 @@ public class help extends JavaPlugin {
 			"&a/cb edit&f - Edit the commands in the book\n" + 
 			"&a/cb info&f - List all commands in the book\n" +
 			"&a/cb private&f - Make your normal book private\n" +
-			"&a/cb about&f - Show more information about the plugin";
+			"&a/cb public&f - Make your book public\n" +
+			"&a/cb about&f - Show more information about the plugin\n" + 
+			"&c/cb reload&f - Reload configuration";
 	static String cmdbook_about_str = "&6----------[ cmdBook About ]----------\n" +
 			"&6Name: cmdBook - Execute multiple commands\n" +
 			"&6Version: ";
@@ -53,7 +55,7 @@ public class help extends JavaPlugin {
 		Logger logger = Logger.getLogger("Minecraft");
 		// Generate help text
 		String HelpTxt = chatColor.stringtodata(id);
-		String HelpTxt_console = chatColor.stringtodelete(id);
+		String HelpTxt_console = chatColor.stringtoconsole(id);
 		
 		// Send to sender
 		if(player==null){
@@ -84,7 +86,7 @@ public class help extends JavaPlugin {
 		Logger logger = Logger.getLogger("Minecraft");
 		// Generate help text
 		String HelpTxt = chatColor.stringtodata(id + pdfFile.getVersion() + cmdbook_about_str2);
-		String HelpTxt_console = chatColor.stringtodelete(id + pdfFile.getVersion() + cmdbook_about_str2);
+		String HelpTxt_console = chatColor.stringtoconsole(id + pdfFile.getVersion() + cmdbook_about_str2);
 		
 		// Send to sender
 		if(player==null){

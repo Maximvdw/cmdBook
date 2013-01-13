@@ -27,7 +27,6 @@ public class PlayerListener implements Listener {
 	static String error_noread = "&cYou cannot read a &4cmdBook&c!";
 
 	// Confirm messages (Handy for other languages)
-	static String confirm_commandsperformed = "&acmdBook Commands performed!";
 	static String confirm_opening = "&aThis book is protected!";
 
 	// Get arguments from main class
@@ -35,7 +34,6 @@ public class PlayerListener implements Listener {
 		plugin = cmdBook;
 	}
 
-	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		final Player player = event.getPlayer();
@@ -66,7 +64,7 @@ public class PlayerListener implements Listener {
 				if (player.hasPermission("cmdbook.use")) {
 					// Player has permisions
 					plugin.getServer().getScheduler()
-					.scheduleAsyncDelayedTask(plugin, new Runnable() {
+					.runTaskLaterAsynchronously(plugin, new Runnable() {
 						public void run() {
 							Book execute = new Book(plugin);
 							execute.performCommands(player);
@@ -90,8 +88,6 @@ public class PlayerListener implements Listener {
 							}
 							// -------------------
 
-							player.sendMessage(chatColor
-									.stringtodata(confirm_commandsperformed));
 						}
 					}, 0L);
 				} else {
@@ -117,12 +113,17 @@ public class PlayerListener implements Listener {
 				player.sendMessage(chatColor.stringtodata(error_noread));
 				player.closeInventory();
 			}else{
-				if (book.getAuthor() == player.getName() && book.getDisplayName().startsWith(ChatColor.BLUE + "") || player.hasPermission("cmdbook.readall"))
+				if (book.getDisplayName().startsWith(ChatColor.BLUE + ""))
 				{
-					player.sendMessage(chatColor.stringtodata(confirm_opening));
-				}else if (book.getAuthor() != player.getName()){
-					player.sendMessage(chatColor.stringtodata(error_permission));
-					player.closeInventory();
+					if (book.getAuthor() == player.getName() && book.getDisplayName().startsWith(ChatColor.BLUE + "") || player.hasPermission("cmdbook.readall"))
+					{
+						player.sendMessage(chatColor.stringtodata(confirm_opening));
+					}else if (book.getAuthor() != player.getName()){
+						player.sendMessage(chatColor.stringtodata(error_permission));
+						player.closeInventory();
+					}
+				}else{
+					// nothing
 				}
 			}
 		}
