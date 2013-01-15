@@ -10,10 +10,10 @@ import java.util.regex.Pattern;
 
 import org.bukkit.plugin.PluginDescriptionFile;
 
-/* Name:		Updater Class
- * Version: 	1.0.0
+/* Name:		cmdBook
+ * Version: 	1.3.1
  * Made by: 	Maxim Van de Wynckel
- * Build date:	11/09/2012						
+ * Build date:	13/10/2013						
  */
 
 public class updater {

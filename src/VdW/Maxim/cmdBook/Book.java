@@ -1,6 +1,5 @@
 package VdW.Maxim.cmdBook;
 
-import java.io.Console;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -15,6 +14,7 @@ import net.minecraft.server.v1_4_6.NBTTagCompound;
 import net.minecraft.server.v1_4_6.NBTTagList;
 import net.minecraft.server.v1_4_6.NBTTagString;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.conversations.Conversation;
@@ -31,7 +31,7 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import VdW.Maxim.cmdBook.cmdBook;
 
 /* Name:		cmdBook
- * Version: 	1.3.0
+ * Version: 	1.3.1
  * Made by: 	Maxim Van de Wynckel
  * Build date:	10/01/2013						
  */
@@ -102,6 +102,16 @@ public class Book {
 				bookContent = pageContents[i].replace("\n", "");
 				// Check if bookcontent includes a || in a command
 				bookContent = bookContent.replace("||", "#TOKEN#");
+				
+				if (bookContent.toLowerCase().contains("@runconsole")){
+					bookContent = bookContent.replace("@runconsole", "");
+					commandList += "&4Commands will be run as console\n";
+				}
+				if (bookContent.toLowerCase().contains("@hidemessages")){
+					bookContent = bookContent.replace("@hidemessages", "");
+					commandList += "&4cmdBook Messages will be hidden\n";
+				}
+				
 				// Now read every letter and search for |
 				for (int j = 1; j < bookContent.length() + 1; j++) {
 					if (bookContent.charAt(j - 1) == seperator
@@ -468,9 +478,9 @@ public class Book {
 				if (bookContent.charAt(j - 1) == seperator
 						|| bookContent.length() == j) {
 					cmd_counter += 1;
-					plugin.logger.info(cmdFormat + "Found " + cmd_counter + " commands in " + player.getName() + "'s cmdBook");
 				}
 			}
+			plugin.logger.info(cmdFormat + "Found " + cmd_counter + " commands in " + player.getName() + "'s cmdBook");
 
 			String[] tmpArray = new String[cmd_list.length];
 			for (int j = 0; j < cmd_list.length; j++) {
@@ -498,18 +508,20 @@ public class Book {
 					}
 					count = 0;
 				}
-				if (bookContent.charAt(j - 1) == '$') {
+				
+				// Check for @input
+				if (bookContent.charAt(j - 1) == '@') {
 					// Check if it is an input
 					if (bookContent.substring(j - 1, j + 5).equalsIgnoreCase(
-							"$input")) {
+							"@input")) {
 						// It is an input
 						String questionUser = "";
-						String inputStr_Replace = "$input";
+						String inputStr_Replace = "@input";
 						if (bookContent.charAt(j + 5) == '[') {
 							try {
 								questionUser = bookContent.substring(j + 6,
 										bookContent.indexOf("]", j + 7));
-								inputStr_Replace = "$input[" + questionUser
+								inputStr_Replace = "@input[" + questionUser
 										+ "]";
 							} catch (Exception ex) {
 								// Error
@@ -525,7 +537,7 @@ public class Book {
 							final Map<Object, Object> map = new HashMap<Object, Object>();
 							map.put("data", chatColor
 									.stringtodata(variable_inputquestion
-											+ questionUser));
+											+ chatColor.stringtodata(questionUser)));
 							Conversation conv = factory
 									.withFirstPrompt(new inputPlayer() {
 									}).withInitialSessionData(map)
@@ -586,11 +598,96 @@ public class Book {
 		for (int i = 0; i < cmd_list.length-1; i++) {
 			try {
 				String command = cmd_list[i];
+				
+				// Check for input
+				for (int j = 1; j < command.length() + 1; j++) {
+					if (command.charAt(j - 1) == '$') {
+						// Check if it is an input
+						if (command.substring(j - 1, j + 5).equalsIgnoreCase(
+								"$input")) {
+							// It is an input
+							String questionUser = "";
+							String inputStr_Replace = "$input";
+							if (command.charAt(j + 5) == '[') {
+								try {
+									questionUser = command.substring(j + 6,
+											command.indexOf("]", j + 7));
+									inputStr_Replace = "$input[" + questionUser
+											+ "]";
+								} catch (Exception ex) {
+									// Error
+								}
+							}
+							ConversationFactory factory;
+
+							// Constructor or whatever init method
+							factory = new ConversationFactory(plugin);
+
+							// Where plugin = your JavaPlugin class instance
+							if (player instanceof Player) {
+								final Map<Object, Object> map = new HashMap<Object, Object>();
+								map.put("data", chatColor
+										.stringtodata(variable_inputquestion
+												+ chatColor.stringtodata(questionUser)));
+								Conversation conv = factory
+										.withFirstPrompt(new inputPlayer() {
+										}).withInitialSessionData(map)
+										.withLocalEcho(false)
+										.buildConversation((Player) player);
+								conv.addConversationAbandonedListener(new ConversationAbandonedListener() {
+
+									@Override
+									public void conversationAbandoned(
+											ConversationAbandonedEvent event) {
+										answer = ""
+												+ event.getContext()
+														.getSessionData("data");
+									}
+								});
+								conv.begin();
+
+								while (answer == "") {
+									try {
+										Thread.currentThread().sleep(10);
+									} catch (InterruptedException e) {
+									}
+								}
+
+								if (answer == "/abort") {
+									// Abort
+									answer = "";
+									break;
+								}
+
+								// Replace input
+								try {
+									plugin.logger.info(cmdFormat + player.getName()
+											+ " input : " + answer);
+									command = command.substring(0, j - 1)
+											+ answer
+											+ command
+													.substring(j
+															+ inputStr_Replace
+																	.length() - 1);
+									answer = ""; // Reset
+								} catch (Exception ex) {
+									// Error
+									plugin.logger.severe(cmdFormat
+											+ "Unable to replace the input!");
+									player.sendMessage(chatColor
+											.stringtodata(error_broken));
+									return;
+								}
+							}
+						}
+					}
+				}
+				
 				try {
 					// Check for calculations
 					ScriptEngineManager mgr = new ScriptEngineManager();
 					ScriptEngine engine = mgr.getEngineByName("javascript");
-					Pattern regex = Pattern.compile("calc\\((.*?)\\)");
+					Pattern regex = Pattern.compile("$calc\\[(.*?)\\]");
 					Matcher regexMatcher = regex.matcher(command);
 					String strCalc = "";
 					while (regexMatcher.find()) {
@@ -601,18 +698,43 @@ public class Book {
 								// match end: regexMatcher.end(i)
 								engine.getBindings(ScriptContext.ENGINE_SCOPE);
 								strCalc = regexMatcher.group(x)
-										.toLowerCase().replace("(", "");
-								strCalc = strCalc.replace(")", "");
-								plugin.logger.info(strCalc);
-								plugin.logger.info(regexMatcher.group(x).toString());
+										.toLowerCase().replace("[", "");
+								strCalc = strCalc.replace("]", "");
 								double d = Double.parseDouble(engine.eval(strCalc)
 										+ "");
 								int integer = (int) d;
-								command = command.replace("calc("
-										+ regexMatcher.group(x).toString() + ")", ""
+								command = command.replace("$calc["
+										+ regexMatcher.group(x).toString() + "]", ""
 										+ integer);	
 							}catch (Exception ex){
 								player.sendMessage(chatColor.stringtodata("&cThe calculation '" + strCalc + "' could not be made!"));
+							}
+						}
+					}
+					
+					// Check for script
+					mgr = new ScriptEngineManager();
+					engine = mgr.getEngineByName("javascript");
+					regex = Pattern.compile("$script\\[(.*?)\\]");
+					regexMatcher = regex.matcher(command);
+					strCalc = "";
+					while (regexMatcher.find()) {
+						for (int x = 1; x <= regexMatcher.groupCount(); x++) {
+							try{
+								// matched text: regexMatcher.group(i)
+								// match start: regexMatcher.start(i)
+								// match end: regexMatcher.end(i)
+								engine.getBindings(ScriptContext.ENGINE_SCOPE);
+								strCalc = regexMatcher.group(x)
+										.replace("[", "");
+								strCalc = strCalc.replace("]", "");
+								engine.eval(strCalc);
+								String data = "" + engine.get("output");
+								command = command.replace("$script["
+										+ regexMatcher.group(x).toString() + "]", ""
+										+ data);	
+							}catch (Exception ex){
+								player.sendMessage(chatColor.stringtodata("&cThe script '" + strCalc + "' could not be parsed!"));
 							}
 						}
 					}
@@ -633,6 +755,27 @@ public class Book {
 						this.logger.info(cmdFormat + player.getName()
 								+ " sleeping " + timewait);
 						Thread.currentThread().sleep(timewait);
+					}else if (command.toLowerCase().startsWith("$msg[")){
+						// Get time
+						String message = "";
+						message = command.substring("$msg[".length(),command.indexOf("]"));
+						player.sendMessage(chatColor.stringtodata(message));
+						this.logger.info(cmdFormat + player.getName()
+								+ " message send: " + message);
+					}else if (command.toLowerCase().startsWith("$chat[")){
+						// Get time
+						String message = "";
+						message = command.substring("$chat[".length(),command.indexOf("]"));
+						player.chat(chatColor.stringtodata(message));
+						this.logger.info(cmdFormat + player.getName()
+								+ " send chat: " + message);
+					}else if (command.toLowerCase().startsWith("$broadcast[")){
+						// Get time
+						String message = "";
+						message = command.substring("$broadcast[".length(),command.indexOf("]"));
+						Bukkit.broadcastMessage(chatColor.stringtodata(message));
+						this.logger.info(cmdFormat + player.getName()
+								+ " broadcast send: " + message);
 					}else{
 						if (command.startsWith("/"))
 						{

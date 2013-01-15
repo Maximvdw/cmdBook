@@ -8,6 +8,42 @@ commands:
   cb:
     description: Utilize the plugin
 permissions:
+    cmdbook.administrator:
+        description: Administrators can do anything
+        default: op
+        children:
+           cmdbook.*: true
+    cmdbook.moderator:
+        description: Moderators can use better cmdBooks and read all books
+        default: op
+        children:
+           cmdbook.use: true
+           cmdbook.about: true
+           cmdbook.help: true
+           cmdbook.private.own: true
+           cmdbook.public.own: true
+           cmdbook.variable.runconsole: true
+           cmdbook.variable.hidemessages: true
+           cmdbook.input: true
+           cmdbook.calculation: true
+           cmdbook.javascript: true
+           cmdbook.create: false
+           cmdbook.readall: true
+    cmdbook.user:
+        description: Users can use cmdBooks, but not create them
+        default: op
+        children:
+           cmdbook.use: true
+           cmdbook.about: true
+           cmdbook.help: true
+           cmdbook.private.own: true
+           cmdbook.public.own: true
+           cmdbook.variable.runconsole: true
+           cmdbook.variable.hidemessages: true
+           cmdbook.input: true
+           cmdbook.calculation: true
+           cmdbook.javascript: false
+           cmdbook.create: false
     cmdbook.*:
         description: Gives access to all cmdBook commands
         default: op
@@ -44,6 +80,9 @@ permissions:
             cmdbook.variable.runconsole: true
             cmdbook.variable.hidemessages: true
             cmdbook.reload: true
+            cmdbook.input: true
+            cmdbook.calculation: true
+            cmdbook.javascript: true
     cmdbook.use:
         description: Allows a user to use a cmdBook
         default: true
@@ -65,36 +104,58 @@ permissions:
     cmdbook.variable.player:
         description: Allows a user to use the $player variable
         default: true
+        children:
+            cmdbook.use.player: true
     cmdbook.variable.targetplayer:
         description: Allows a user to use the $targetplayer variable
         default: true
+        children:
+            cmdbook.use.targetplayer: true
     cmdbook.variable.health:
         description: Allows a user to use the $health variable
         default: true
+        children:
+            cmdbook.use.health: true
     cmdbook.variable.xp:
         description: Allows a user to use the $xp variable
         default: true
+        children:
+            cmdbook.use.xp: true
     cmdbook.variable.targetxp:
         description: Allows a user to use the $targetxp variable
         default: true
+        children:
+            cmdbook.use.targetxp: true
     cmdbook.variable.lvl:
         description: Allows a user to use the $targetxp variable
         default: true
+        children:
+            cmdbook.use.lvl: true
     cmdbook.variable.targetlvl:
         description: Allows a user to use the $targetlvl variable
         default: true
+        children:
+            cmdbook.use.targetlvl: true
     cmdbook.variable.hunger:
         description: Allows a user to use the $hunger variable
         default: true
+        children:
+            cmdbook.use.hunger: true
     cmdbook.variable.targethunger:
         description: Allows a user to use the $targethunger variable
         default: true
+        children:
+            cmdbook.use.targethunger: true
     cmdbook.variable.killer:
         description: Allows a user to use the $killer variable
         default: true
+        children:
+            cmdbook.use.killer: true
     cmdbook.variable.targetkiller:
         description: Allows a user to use the $targetkiller variable
         default: true
+        children:
+            cmdbook.use.targetkiller: true
     cmdbook.variable.xpos:
         description: Gets your Xpos
         default: true    
