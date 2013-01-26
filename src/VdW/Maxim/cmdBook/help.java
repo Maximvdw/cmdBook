@@ -33,6 +33,7 @@ public class help extends JavaPlugin {
 			"&a/cb private&f - Make your normal book private\n" +
 			"&a/cb public&f - Make your book public\n" +
 			"&a/cb about&f - Show more information about the plugin\n" + 
+			"&c/cb convert&f - Convert deprecated variables\n" + 
 			"&c/cb reload&f - Reload configuration";
 	static String cmdbook_about_str = "&6----------[ cmdBook About ]----------\n" +
 			"&6Name: cmdBook - Execute multiple commands\n" +

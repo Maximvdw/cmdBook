@@ -91,6 +91,7 @@ public class Configuration {
 			// Error in config
 			plugin.logger.severe(cmdFormat
 					+ "An error ocured while loading the config!");
+			plugin.logger.severe(cmdFormat + e.getMessage());
 		}
 	}
 

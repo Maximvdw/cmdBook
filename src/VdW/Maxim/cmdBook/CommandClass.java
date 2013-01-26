@@ -8,16 +8,14 @@ package VdW.Maxim.cmdBook;
 
 import java.util.logging.Logger;
 
-import net.minecraft.server.v1_4_6.Item;
-
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.plugin.PluginDescriptionFile;
 
 public class CommandClass implements CommandExecutor {
 	// Create global variables
@@ -36,14 +34,19 @@ public class CommandClass implements CommandExecutor {
 	static String error_nobook = "&cYou can only use this command on a Written book!";
 	static String error_noauthor = "&cOnly the author of this book can protect it!";
 	static String error_noauthor2 = "&cOnly the author of this book can make it public!";
-	
+
 	// Confirm messages
-	static String confirm_private ="&aYour book has been made private!";
+	static String confirm_private = "&aYour book has been made private!";
 	static String confirm_unprivate = "&2Your book has been made public!";
-	static String confirm_reloaded = "&2[&fcmdBook$2] &aReload complete!";
+	static String confirm_reloaded = "&2[&fcmdBook&2] &aReload complete!";
 
 	public boolean onCommand(CommandSender sender, Command cmd,
 			String cmdLabel, String[] args) {
+		// PUT THIS INTO EVERY METHOD
+		PluginDescriptionFile pdfFile = plugin.getDescription();
+		String cmdFormat = "[" + pdfFile.getName() + "] ";
+		// --------------------------
+
 		// This function will be triggered whenever a player
 		// performs a command
 
@@ -77,85 +80,118 @@ public class CommandClass implements CommandExecutor {
 					// Show HELP
 					help help = new help(plugin);
 					help.cmdbook_help(player);
-				} else if (argument.equalsIgnoreCase("public")) {
-					// Make the book unprivate
-					try{
+				} else if (argument.equalsIgnoreCase("convert")) {
+					try {
 						if (player == null) {
 							// Console cannot create a book
-							this.logger.warning(chatColor.stringtodata(error_console));
+							this.logger.warning(chatColor
+									.stringtodata(error_console));
+						} else {
+							Book converter = new Book(plugin);
+							converter.convertBook(player);
+						}
+					} catch (Exception ex) {
+
+					}
+				} else if (argument.equalsIgnoreCase("public")) {
+					// Make the book unprivate
+					try {
+						if (player == null) {
+							// Console cannot create a book
+							this.logger.warning(chatColor
+									.stringtodata(error_console));
 						} else {
 							ItemStack is = player.getItemInHand();
 
 							// Check if the player is holding a book
-							if (is.getTypeId() == 387)
-							{
+							if (is.getTypeId() == 387) {
 								BookMeta book = (BookMeta) is.getItemMeta();
-								if (book.getAuthor() == player.getName() || player.hasPermission("cmdbook.public.all"))
-								{
-									if (player.hasPermission("cmdbook.public.own"))
-									{
-										book.setDisplayName(ChatColor.RESET + book.getTitle());
-									    is.setItemMeta(book);
-									    player.sendMessage(chatColor.stringtodata(confirm_unprivate));	
+								if (book.getAuthor() == player.getName()
+										|| player
+												.hasPermission("cmdbook.public.all")) {
+									if (player
+											.hasPermission("cmdbook.public.own")) {
+										book.setDisplayName(ChatColor.RESET
+												+ book.getTitle());
+										is.setItemMeta(book);
+										player.sendMessage(chatColor
+												.stringtodata(confirm_unprivate));
 									}
-								}else{
+								} else {
 									// Player is not the author
-									player.sendMessage(chatColor.stringtodata(error_noauthor2));
+									player.sendMessage(chatColor
+											.stringtodata(error_noauthor2));
 								}
-							}else{
+							} else {
 								// No book
-								player.sendMessage(chatColor.stringtodata(error_nobook));
+								player.sendMessage(chatColor
+										.stringtodata(error_nobook));
 							}
 						}
-					}catch(Exception ex){
-						
+					} catch (Exception ex) {
+
 					}
 				} else if (argument.equalsIgnoreCase("private")) {
 					// Make the book private
-					try{
+					try {
 						if (player == null) {
 							// Console cannot create a book
-							this.logger.warning(chatColor.stringtodata(error_console));
+							this.logger.warning(chatColor
+									.stringtodata(error_console));
 						} else {
 							ItemStack is = player.getItemInHand();
 
 							// Check if the player is holding a book
-							if (is.getTypeId() == 387)
-							{
+							if (is.getTypeId() == 387) {
 								BookMeta book = (BookMeta) is.getItemMeta();
-								if ((book.getAuthor() == player.getName() )|| player.hasPermission("cmdbook.private.all"))
-								{
-									if (player.hasPermission("cmdbook.private.own"))
-									{
-										book.setDisplayName(ChatColor.BLUE + book.getTitle());
-									    is.setItemMeta(book);
-									    player.sendMessage(chatColor.stringtodata(confirm_private));
+								if ((book.getAuthor() == player.getName())
+										|| player
+												.hasPermission("cmdbook.private.all")) {
+									if (player
+											.hasPermission("cmdbook.private.own")) {
+										book.setDisplayName(ChatColor.BLUE
+												+ book.getTitle());
+										is.setItemMeta(book);
+										player.sendMessage(chatColor
+												.stringtodata(confirm_private));
 									}
-								}else{
+								} else {
 									// Player is not the author
-									player.sendMessage(chatColor.stringtodata(error_noauthor));
+									player.sendMessage(chatColor
+											.stringtodata(error_noauthor));
 								}
-							}else{
+							} else {
 								// No book
-								player.sendMessage(chatColor.stringtodata(error_nobook));
+								player.sendMessage(chatColor
+										.stringtodata(error_nobook));
 							}
 						}
-					}catch(Exception ex){
-						
+					} catch (Exception ex) {
+
 					}
 				} else if (argument.equalsIgnoreCase("reload")) {
 					// Reload configuration
 					if (player == null) {
 						Configuration cfg = new Configuration(plugin);
 						cfg.loadYamls();
+						plugin.splitCmd = Configuration.config
+								.getString("cmd_split"); // Get split character
+						this.logger.info(cmdFormat + "Using split character '"
+								+ plugin.splitCmd + "'");
+						if (plugin.splitCmd == "") {
+							this.logger
+									.severe(cmdFormat
+											+ "No split character found! Using default '|'");
+							plugin.splitCmd = "|";
+						}
 						logger.info(chatColor.stringtoconsole(confirm_reloaded));
-					}else{
-						if (player.hasPermission("cmdbook.reload"))
-						{
+					} else {
+						if (player.hasPermission("cmdbook.reload")) {
 							Configuration cfg = new Configuration(plugin);
 							cfg.loadYamls();
-							player.sendMessage(chatColor.stringtodata(confirm_reloaded));
-						}else{
+							player.sendMessage(chatColor
+									.stringtodata(confirm_reloaded));
+						} else {
 							// No permission
 							player.sendMessage(chatColor
 									.stringtodata(error_permission));
@@ -166,7 +202,8 @@ public class CommandClass implements CommandExecutor {
 					// Check if it is a player and has permissions
 					if (player == null) {
 						// Console cannot create a book
-						this.logger.warning(chatColor.stringtodata(error_console));
+						this.logger.warning(chatColor
+								.stringtodata(error_console));
 					} else {
 						// Check if player has permissions
 						if (player.hasPermission("cmdbook.create")) {
@@ -187,7 +224,8 @@ public class CommandClass implements CommandExecutor {
 					// Unsign a cmdBook
 					if (player == null) {
 						// Console cannot create a book
-						this.logger.warning(chatColor.stringtodata(error_console));
+						this.logger.warning(chatColor
+								.stringtodata(error_console));
 					} else {
 						// Check if player has permissions
 						if (player.hasPermission("cmdbook.edit")) {
@@ -204,7 +242,8 @@ public class CommandClass implements CommandExecutor {
 					// Get commands inside a book
 					if (player == null) {
 						// Console cannot create a book
-						this.logger.warning(chatColor.stringtodata(error_console));
+						this.logger.warning(chatColor
+								.stringtodata(error_console));
 					} else {
 						// Check if player has permissions
 						if (player.hasPermission("cmdbook.info")) {

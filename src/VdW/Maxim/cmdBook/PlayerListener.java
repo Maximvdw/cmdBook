@@ -11,11 +11,14 @@ import java.util.logging.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
+import VdW.Maxim.cmdBook.Metrics.IncrementalPlotter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+
+import VdW.Maxim.cmdBook.Metrics.Metrics;
 
 public class PlayerListener implements Listener {
 	// Create global variables
@@ -40,7 +43,7 @@ public class PlayerListener implements Listener {
 		// Get the item the player has in his hand
 		ItemStack is = player.getItemInHand();
 		BookMeta book = (BookMeta) is.getItemMeta();
-		
+
 		// Check if the player is holding a book
 		if (is.getTypeId() == 387
 				& (event.getAction() == Action.LEFT_CLICK_AIR || event
@@ -48,15 +51,14 @@ public class PlayerListener implements Listener {
 			// Player is holding a book
 			// Now check if it is a cmdBook
 			Book check = new Book(plugin);
-			String[] pageContent = check.getBookContent(player);
+			Object pageContent[] = check.getBookContent(player);
 
 			// Now read author
 			String authorPlugin = (ChatColor.RED + "cmdBook").toString(); // The
 																			// cmdBook
 			// author
-			if (pageContent[0].toLowerCase().startsWith("[cmdbook]")
-					& book.getAuthor()
-							.equalsIgnoreCase(authorPlugin)) {
+			if (pageContent[0].toString().toLowerCase().startsWith("[cmdbook]")
+					& book.getAuthor().equalsIgnoreCase(authorPlugin)) {
 				// It is a cmdBook
 				// Now check if the player has permission
 				// to execute that
@@ -64,65 +66,60 @@ public class PlayerListener implements Listener {
 				if (player.hasPermission("cmdbook.use")) {
 					// Player has permisions
 					plugin.getServer().getScheduler()
-					.runTaskLaterAsynchronously(plugin, new Runnable() {
-						public void run() {
-							Book execute = new Book(plugin);
-							execute.performCommands(player);
+							.runTaskLaterAsynchronously(plugin, new Runnable() {
+								public void run() {
+									Book execute = new Book(plugin);
+									execute.performCommands(player);
 
-							// Add Metrics Graph
-							try {
-							    Metrics metrics = new Metrics(plugin);
+									// Add Metrics Graph
+									try {
+										Metrics metrics = new Metrics(plugin);
 
-							    // Plot the total amount of protections
-							    metrics.addCustomData(new Metrics.Plotter("Total cmdBook usages") {
+										// Plot the total amount of protections
+										metrics.addCustomData(new IncrementalPlotter("Total cmdBook usages"));
+										metrics.start();
+									} catch (IOException e) {
+										// Error
+									}
+									// -------------------
 
-							        @Override
-							        public int getValue() {
-							            return 1;
-							        }
-
-							    });
-							    metrics.start();
-							} catch (IOException e) {
-							    // Error
-							}
-							// -------------------
-
-						}
-					}, 0L);
+								}
+							}, 0L);
 				} else {
 					// No permission
 					player.closeInventory();
 					player.sendMessage(chatColor.stringtodata(error_permission));
 				}
 			}
-		}else if (is.getTypeId() == 387
+		} else if (is.getTypeId() == 387
 				& (event.getAction() == Action.RIGHT_CLICK_AIR || event
-				.getAction() == Action.RIGHT_CLICK_BLOCK)) {
+						.getAction() == Action.RIGHT_CLICK_BLOCK)) {
 			// Player is holding a book
-						// Now check if it is a cmdBook
-						Book check = new Book(plugin);
-						String[] pageContent = check.getBookContent(player);
+			// Now check if it is a cmdBook
+			Book check = new Book(plugin);
+			Object pageContent[] = check.getBookContent(player);
 
-						// Now read author
-						String authorPlugin = (ChatColor.RED + "cmdBook").toString(); // The
-																						// cmdBook
-			if (pageContent[0].toLowerCase().startsWith("[cmdbook]")
-					& book.getAuthor()
-							.equalsIgnoreCase(authorPlugin)) {
+			// Now read author
+			String authorPlugin = (ChatColor.RED + "cmdBook").toString(); // The
+																			// cmdBook
+			if (pageContent[0].toString().toLowerCase().startsWith("[cmdbook]")
+					& book.getAuthor().equalsIgnoreCase(authorPlugin)) {
 				player.sendMessage(chatColor.stringtodata(error_noread));
 				player.closeInventory();
-			}else{
-				if (book.getDisplayName().startsWith(ChatColor.BLUE + ""))
-				{
-					if (book.getAuthor() == player.getName() && book.getDisplayName().startsWith(ChatColor.BLUE + "") || player.hasPermission("cmdbook.readall"))
-					{
-						player.sendMessage(chatColor.stringtodata(confirm_opening));
-					}else if (book.getAuthor() != player.getName()){
-						player.sendMessage(chatColor.stringtodata(error_permission));
+			} else {
+				if (book.getDisplayName().startsWith(ChatColor.BLUE + "")) {
+					if (book.getAuthor() == player.getName()
+							&& book.getDisplayName().startsWith(
+									ChatColor.BLUE + "")
+							|| player.hasPermission("cmdbook.readall")) {
+						player.sendMessage(chatColor
+								.stringtodata(confirm_opening));
+					} else if (book.getAuthor() != player.getName()) {
+						player.sendMessage(chatColor
+								.stringtodata(error_permission));
 						player.closeInventory();
 					}
-				}else{
+				} else {
 					// nothing
 				}
 			}

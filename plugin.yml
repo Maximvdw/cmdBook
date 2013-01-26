@@ -1,6 +1,6 @@
 name: cmdBook
 main: VdW.Maxim.cmdBook.cmdBook
-version: 1.3.0
+version: 1.3.2
 website: http://dev.bukkit.org/server-mods/cmdBook/
 author: Maximvdw
 description: Execute multiple commands in a book
@@ -72,17 +72,24 @@ permissions:
             cmdbook.variable.losx: true
             cmdbook.variable.losy: true
             cmdbook.variable.losz: true
+            cmdbook.variable.runconsole: true
+            cmdbook.variable.hidemessages: true
+            cmdbook.variable.broadcast: true
+            cmdbook.variable.message: true
+            cmdbook.variable.chat: true
+            cmdbook.variable.calculation: true
+            cmdbook.variable.javascript: true
             cmdbook.readall: true
             cmdbook.private.own: true
             cmdbook.public.own: true
             cmdbook.private.all: true
             cmdbook.public.all: true
-            cmdbook.variable.runconsole: true
-            cmdbook.variable.hidemessages: true
             cmdbook.reload: true
             cmdbook.input: true
-            cmdbook.calculation: true
-            cmdbook.javascript: true
+            cmdbook.convert: true
+    cmdbook.convert:
+        description: Convert deprecated variables
+        default: true
     cmdbook.use:
         description: Allows a user to use a cmdBook
         default: true
@@ -101,88 +108,200 @@ permissions:
     cmdbook.info:
         description: Allows a user to see the commands inside a book
         default: op
+    cmdbook.variable.script:
+        description: Allows a player to add the script[] in a book
+        default: true
+        children:
+            cmdbook.use.script: true
+    cmdbook.variable.calculation:
+        description: Allows a player to add the calc[] in a book
+        default: true
+        children:
+            cmdbook.use.calculation: true
     cmdbook.variable.player:
-        description: Allows a user to use the $player variable
+        description: Allows a user to add the $player variable
         default: true
         children:
             cmdbook.use.player: true
     cmdbook.variable.targetplayer:
-        description: Allows a user to use the $targetplayer variable
+        description: Allows a user to add the $targetplayer variable
         default: true
         children:
             cmdbook.use.targetplayer: true
     cmdbook.variable.health:
-        description: Allows a user to use the $health variable
+        description: Allows a user to add the $health variable
         default: true
         children:
             cmdbook.use.health: true
     cmdbook.variable.xp:
-        description: Allows a user to use the $xp variable
+        description: Allows a user to add the $xp variable
         default: true
         children:
             cmdbook.use.xp: true
     cmdbook.variable.targetxp:
-        description: Allows a user to use the $targetxp variable
+        description: Allows a user to add the $targetxp variable
         default: true
         children:
             cmdbook.use.targetxp: true
     cmdbook.variable.lvl:
-        description: Allows a user to use the $targetxp variable
+        description: Allows a user to add the $targetxp variable
         default: true
         children:
             cmdbook.use.lvl: true
     cmdbook.variable.targetlvl:
-        description: Allows a user to use the $targetlvl variable
+        description: Allows a user to add the $targetlvl variable
         default: true
         children:
             cmdbook.use.targetlvl: true
     cmdbook.variable.hunger:
-        description: Allows a user to use the $hunger variable
+        description: Allows a user to add the $hunger variable
         default: true
         children:
             cmdbook.use.hunger: true
     cmdbook.variable.targethunger:
-        description: Allows a user to use the $targethunger variable
+        description: Allows a user to add the $targethunger variable
         default: true
         children:
             cmdbook.use.targethunger: true
     cmdbook.variable.killer:
-        description: Allows a user to use the $killer variable
+        description: Allows a user to add the $killer variable
         default: true
         children:
             cmdbook.use.killer: true
     cmdbook.variable.targetkiller:
-        description: Allows a user to use the $targetkiller variable
+        description: Allows a user to add the $targetkiller variable
         default: true
         children:
             cmdbook.use.targetkiller: true
     cmdbook.variable.xpos:
+        description: Allows a user to add the variable to get your Xpos
+        default: true    
+        children:
+            cmdbook.use.xpos: true
+    cmdbook.variable.ypos:
+        description: Allows a user to add the variable to get your Ypos
+        default: true
+        children:
+            cmdbook.use.ypos: true
+    cmdbook.variable.targetxpos:
+        description: Allows a user to add the variable to get your targets Xpos
+        default: true
+        children:
+            cmdbook.use.targetxpos: true
+    cmdbook.variable.targetypos:
+        description: Allows a user to add the variable to get your targets Ypos
+        default: true
+        children:
+            cmdbook.use.targetypos: true
+    cmdbook.variable.losx:
+        description: Allows a user to add the variable to get the location (x) of the block you are looking at
+        default: true
+        children:
+            cmdbook.use.losx: true
+    cmdbook.variable.losy:
+        description: Allows a user to add the variable to get the location (y) of the block you are looking at
+        default: true
+        children:
+            cmdbook.use.losy: true
+    cmdbook.variable.losz:
+        description: Allows a user to add the variable to get the location (z) of the block you are looking at
+        default: true
+        children:
+            cmdbook.use.losz: true
+    cmdbook.variable.runconsole:
+        description: Allows a user to add the variable to let the console run the commands
+        default: op
+        children:
+            cmdbook.use.runconsole: true
+    cmdbook.variable.hidemessages:
+        description: Allows a user to add the variable to Hide cmdBook messages
+        default: op
+        children:
+            cmdbook.use.hidemessages: true
+    cmdbook.variable.broadcast:
+        description: Allows a user to add the variable to Broadcast a message to all players
+        default: op
+        children:
+            cmdbook.use.broadcast: true
+    cmdbook.variable.message:
+        description: Allows a user to add the variable to Send a message to the player holding the book
+        default: op
+        children:
+            cmdbook.use.message: true
+    cmdbook.variable.chat:
+        description: Let player use chat variable when runconsole is enabled
+        default: op
+        children:
+            cmdbook.use.chat: true
+    cmdbook.use.player:
+        description: Allows a user to use the $player use
+        default: true
+    cmdbook.use.targetplayer:
+        description: Allows a user to use the $targetplayer use
+        default: true
+    cmdbook.use.health:
+        description: Allows a user to use the $health use
+        default: true
+    cmdbook.use.xp:
+        description: Allows a user to use the $xp use
+        default: true
+    cmdbook.use.targetxp:
+        description: Allows a user to use the $targetxp use
+        default: true
+    cmdbook.use.lvl:
+        description: Allows a user to use the $targetxp use
+        default: true
+    cmdbook.use.targetlvl:
+        description: Allows a user to use the $targetlvl use
+        default: true
+    cmdbook.use.hunger:
+        description: Allows a user to use the $hunger use
+        default: true
+    cmdbook.use.targethunger:
+        description: Allows a user to use the $targethunger use
+        default: true
+    cmdbook.use.killer:
+        description: Allows a user to use the $killer use
+        default: true
+    cmdbook.use.targetkiller:
+        description: Allows a user to use the $targetkiller use
+        default: true
+    cmdbook.use.xpos:
         description: Gets your Xpos
         default: true    
-    cmdbook.variable.ypos:
+    cmdbook.use.ypos:
         description: Gets your Ypos
-        default: true 
-    cmdbook.variable.targetxpos:
+        default: true
+    cmdbook.use.targetxpos:
         description: Gets your targets Xpos
-        default: true    
-    cmdbook.variable.targetypos:
+        default: true
+    cmdbook.use.targetypos:
         description: Gets your targets Ypos
         default: true
-    cmdbook.variable.losx:
+    cmdbook.use.losx:
         description: Gets the location (x) of the block you are looking at
         default: true
-    cmdbook.variable.losy:
+    cmdbook.use.losy:
         description: Gets the location (y) of the block you are looking at
         default: true
-    cmdbook.variable.losz:
+    cmdbook.use.losz:
         description: Gets the location (z) of the block you are looking at
         default: true
-    cmdbook.variable.runconsole:
+    cmdbook.use.runconsole:
         description: Let the console run the commands
         default: op
-    cmdbook.variable.hidemessages:
+    cmdbook.use.hidemessages:
         description: Hide cmdBook messages
-        default: op
+        default: true
+    cmdbook.use.broadcast:
+        description: Broadcast a message to all players
+        default: true
+    cmdbook.use.message:
+        description: Send a message to the player holding the book
+        default: true
+    cmdbook.use.chat:
+        description: Let player use chat use when runconsole is enabled
+        default: true
     cmdbook.readall:
         description: Lets you read all protected books
         default: op

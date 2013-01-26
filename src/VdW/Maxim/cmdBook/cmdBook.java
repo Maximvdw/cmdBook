@@ -15,7 +15,7 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import VdW.Maxim.cmdBook.Metrics;
+import VdW.Maxim.cmdBook.Metrics.Metrics;
 
 public class cmdBook extends JavaPlugin {
 	// Create global variables
@@ -23,7 +23,7 @@ public class cmdBook extends JavaPlugin {
 	public cmdBook plugin = this; // Plugin will now refer to cmdBook
 	private CommandClass CommandListener; // Wait for commands in a different
 											// class
-	public char splitCmd = '|'; // The default split command char
+	public String splitCmd = "|"; // The default split command char
 	public boolean allowChat = true; // Allow chat to be executed in cmdBooks
 	public final PlayerListener pl = new PlayerListener(this);
 
@@ -85,7 +85,13 @@ public class cmdBook extends JavaPlugin {
 		try{
 			Configuration.config = new YamlConfiguration();
 			configClass.loadYamls();
-			this.splitCmd = Configuration.config.getString("cmd_split").toCharArray()[1]; // Get split character
+			this.splitCmd = Configuration.config.getString("cmd_split"); // Get split character
+			this.logger.info(cmdFormat + "Using split character '" + splitCmd + "'");
+			if (splitCmd == "")
+			{
+				this.logger.severe(cmdFormat + "No split character found! Using default '|'");
+				splitCmd = "|";
+			}
 		} catch (Exception e) {
 			// Error
 			this.logger.warning(cmdFormat + "Unable to load configuration!");
