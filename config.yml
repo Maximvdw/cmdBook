@@ -1,14 +1,29 @@
 # cmdBook - Configuration File
 # Made by: Maxim Van de Wynckel
-# Copyright © 2012
+# Copyright: 2012-2013
 # -----------------------------
 
 # Allow users to perform chat in a book
+# This does not include the $chat[..] variable
 allow_chat: true
 
 # Default command split symbol
+# Used to split commands on the same page
 cmd_split: '|'
+
+# Allow commands to be executed when trying to read
+# If this is disabled, it will show the message that
+# you cannot read a cmdBook
+executeOnRead: false
 
 # Check for updates. This will not update cmdBook 
 # This will use dev.bukkit.org to check for cmdBook updates
 checkUpdates: true
+
+# Automatically update the plugin when its outdated
+# This will update your plugin
+autoUpdate: true
+
+# DO NOT EDIT THIS LINE
+# DOING SO WILL BREAK cmdBook!
+config: 3

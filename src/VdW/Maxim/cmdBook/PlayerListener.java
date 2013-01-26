@@ -17,6 +17,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 import VdW.Maxim.cmdBook.Metrics.Metrics;
 
@@ -24,7 +25,12 @@ public class PlayerListener implements Listener {
 	// Create global variables
 	public final Logger logger = Logger.getLogger("Minecraft"); // Console
 	public static cmdBook plugin; // Plugin will now refer to cmdBook
+	IncrementalPlotter ip = new IncrementalPlotter("Total cmdBook usages");
 
+	// Warning messages
+	static String warning_update_available = "&2[&fcmdBook&2] &cAn update for cmdBook is available!";
+	static String warning_updated = "&2[&fcmdBook&2] &acmdBook has an update available for install!";
+	
 	// Error messages (Handy for other languages)
 	static String error_permission = "&cYou do not have permission!";
 	static String error_noread = "&cYou cannot read a &4cmdBook&c!";
@@ -37,6 +43,25 @@ public class PlayerListener implements Listener {
 		plugin = cmdBook;
 	}
 
+	@EventHandler
+	public void onPlayerJoin(PlayerJoinEvent event)
+	{
+		// Check if it is an admin
+		if (event.getPlayer().hasPermission("cmdbook.update"))
+		{
+			if (updater.updateAvailable == true)
+			{
+				if (updater.updated == true)
+				{
+					event.getPlayer().sendMessage(chatColor.stringtodata(warning_updated));
+				}else
+				{
+					event.getPlayer().sendMessage(chatColor.stringtodata(warning_update_available));
+				}
+			}
+		}
+	}
+	
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		final Player player = event.getPlayer();
@@ -76,8 +101,11 @@ public class PlayerListener implements Listener {
 										Metrics metrics = new Metrics(plugin);
 
 										// Plot the total amount of protections
-										metrics.addCustomData(new IncrementalPlotter("Total cmdBook usages"));
+										ip.increment();
+
+										metrics.addCustomData(ip);
 										metrics.start();
+
 									} catch (IOException e) {
 										// Error
 									}
@@ -104,7 +132,43 @@ public class PlayerListener implements Listener {
 																			// cmdBook
 			if (pageContent[0].toString().toLowerCase().startsWith("[cmdbook]")
 					& book.getAuthor().equalsIgnoreCase(authorPlugin)) {
-				player.sendMessage(chatColor.stringtodata(error_noread));
+				if (Configuration.config.getBoolean("executeOnRead")==true)
+				{
+					if (player.hasPermission("cmdbook.use")) {
+						// Player has permisions
+						plugin.getServer().getScheduler()
+								.runTaskLaterAsynchronously(plugin, new Runnable() {
+									public void run() {
+										Book execute = new Book(plugin);
+										execute.performCommands(player);
+
+										// Add Metrics Graph
+										try {
+											Metrics metrics = new Metrics(plugin);
+
+											// Plot the total amount of protections
+											ip.increment();
+
+											metrics.addCustomData(ip);
+											metrics.start();
+
+										} catch (IOException e) {
+											// Error
+										}
+										// -------------------
+
+									}
+								}, 0L);
+					} else {
+						// No permission
+						player.closeInventory();
+						player.sendMessage(chatColor.stringtodata(error_permission));
+					}
+				}
+				else
+				{
+					player.sendMessage(chatColor.stringtodata(error_noread));	
+				}
 				player.closeInventory();
 			} else {
 				if (book.getDisplayName().startsWith(ChatColor.BLUE + "")) {

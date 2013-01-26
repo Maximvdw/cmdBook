@@ -13,6 +13,7 @@ permissions:
         default: op
         children:
            cmdbook.*: true
+           cmdbook.update: true
     cmdbook.moderator:
         description: Moderators can use better cmdBooks and read all books
         default: op

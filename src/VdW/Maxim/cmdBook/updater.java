@@ -1,8 +1,12 @@
 package VdW.Maxim.cmdBook;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -11,9 +15,9 @@ import java.util.regex.Pattern;
 import org.bukkit.plugin.PluginDescriptionFile;
 
 /* Name:		cmdBook
- * Version: 	1.3.1
+ * Version: 	1.3.2
  * Made by: 	Maxim Van de Wynckel
- * Build date:	13/10/2013						
+ * Build date:	26/01/2013						
  */
 
 public class updater {
@@ -24,6 +28,7 @@ public class updater {
 
 	// Create global variables
 	public static boolean updateAvailable = false;
+	public static boolean updated = false;
 	public final Logger logger = Logger.getLogger("Minecraft"); // Console
 	public static cmdBook plugin; // Plugin will now refer to cmdBook
 
@@ -37,7 +42,7 @@ public class updater {
 		PluginDescriptionFile pdfFile = plugin.getDescription();
 		String cmdFormat = "[" + pdfFile.getName() + "] ";
 		// --------------------------
-		
+
 		try {
 			URL url = new URL("http://dev.bukkit.org/server-mods/" + devName);
 			InputStream is = url.openConnection().getInputStream();
@@ -46,7 +51,7 @@ public class updater {
 					new InputStreamReader(is));
 			// Get version as string with .=-
 			String versionStr = pdfFile.getVersion().replace(".", "-");
-			
+
 			String line = null;
 			String regExp = ".*<a href=\"(.*/server-mods/" + devName
 					+ "/files/.*-" + devFileSplit + "-.*)\">.*";
@@ -55,14 +60,99 @@ public class updater {
 			while ((line = reader.readLine()) != null) {
 				Matcher m = p.matcher(line);
 				if (m.matches()) {
-					if(!m.group(1).toString().contains(versionStr)){
+					if (!m.group(1).toString().contains(versionStr)) {
 						// Outdated
-						this.logger.warning(cmdFormat + "The plugin is outdated!");
-						updateAvailable=true;
-						return;
-					}else{
-						this.logger.info(cmdFormat + "The plugin is Up-to date");
-						return;
+						this.logger.warning(cmdFormat
+								+ "The plugin is outdated!");
+						updateAvailable = true;
+						// Get url
+						String url_downloadPage = "http://dev.bukkit.org/"
+								+ m.group(1).toString();
+						url = new URL(url_downloadPage);
+						is = url.openConnection().getInputStream();
+
+						reader = new BufferedReader(new InputStreamReader(is));
+
+						line = null;
+						regExp = ".*<a href=\"(.*cmdBook.jar)\">.*";
+						p = Pattern.compile(regExp, Pattern.CASE_INSENSITIVE);
+
+						while ((line = reader.readLine()) != null) {
+							m = p.matcher(line);
+							if (m.matches()) {
+								// URL Found
+								String downloadURL = m.group(1).toString();
+								if (Configuration.config.getBoolean("autoUpdate")==true)
+								{
+									try {
+										/*
+										 * Get a connection to the URL and start up
+										 * a buffered reader.
+										 */
+										long startTime = System.currentTimeMillis();
+										File theDir = new File(System.getProperty("user.dir")
+												+ "/plugins/update/");
+
+										// if the directory does not exist, create
+										// it
+										if (!theDir.exists()) {
+											theDir.mkdir();
+										}
+										
+										System.out.println(cmdFormat
+												+ "Connecting to Bukkit...");
+
+										url = new URL(downloadURL);
+										url.openConnection();
+										InputStream reader_dl = url.openStream();
+
+										/*
+										 * Setup a buffered file writer to write out
+										 * what we read from the website.
+										 */
+										FileOutputStream writer = new FileOutputStream(
+												System.getProperty("user.dir")
+														+ "/plugins/update/cmdBook.jar");
+										byte[] buffer = new byte[153600];
+										int totalBytesRead = 0;
+										int bytesRead = 0;
+
+										System.out.println(cmdFormat
+												+ "Starting download ...");
+
+										while ((bytesRead = reader_dl.read(buffer)) > 0) {
+											writer.write(buffer, 0, bytesRead);
+											buffer = new byte[153600];
+											totalBytesRead += bytesRead;
+										}
+
+										long endTime = System.currentTimeMillis();
+
+										System.out.println(cmdFormat
+												+ "Done. "
+												+ (new Integer(totalBytesRead)
+														.toString())
+												+ " bytes read ("
+												+ (new Long(endTime - startTime)
+														.toString())
+												+ " millseconds).");
+										writer.close();
+										reader.close();
+										updated = true;
+									} catch (MalformedURLException e) {
+										
+									} catch (IOException e) {
+										
+									}	
+								}
+								break;
+							}
+						}
+						break;
+					} else {
+						this.logger
+								.info(cmdFormat + "The plugin is Up-to date");
+						break;
 					}
 				}
 			}
@@ -72,5 +162,4 @@ public class updater {
 			ex.printStackTrace();
 		}
 	}
-
 }
