@@ -48,12 +48,15 @@ public class Book {
 	static String error_permission = "&cYou do not have permission!";
 	static String error_broken = "&cYour cmdBook is broken!";
 	static String error_noprefix = "&cYou have to start your book with &4[cmdbook]&c!";
+	static String error_money = "&2[&fcmdBook&2] &cYou do not have {MONEY}$!";
+	static String error_alreadycmd = "&cThis is already a cmdBook!";
 
 	// Confirm messages (Handy for other languages)
 	static String confirm_bookcreated = "&aYour cmdBook has been created!";
 	static String confirm_unsigned = "&aYour cmdBook has been unsigned!";
 	static String confirm_commandsperformed = "&acmdBook Commands performed!";
 	static String confirm_converted = "&aYour cmdBook has been converted to the latest version!";
+	static String confirm_money = "&2[&fcmdBook&2] &a{MONEY}$ payed!";
 
 	// Other messages (Handy for other languages)
 	static String variable_inputquestion = "&2[&fcmdBook&2] &aInput: ";
@@ -176,21 +179,49 @@ public class Book {
 			// Check if it is a valid cmdBook
 			Object pageContent[] = getBookContent(player);
 			// Check if all variables are allowed
-			
-			
-			if (pageContent[0].toString().toLowerCase().startsWith("[cmdbook]")) {
-				// Commandbook Created :)
-				this.logger.info(cmdFormat + player.getName()
-						+ " created a cmdBook!");
-				player.sendMessage(chatColor.stringtodata(confirm_bookcreated));
-			} else {
-				// This is not a valid cmdbook
-				player.sendMessage(chatColor.stringtodata(error_noprefix));
+			ItemStack is = player.getItemInHand();
+			BookMeta book = (BookMeta) is.getItemMeta();
+			if (book.getAuthor().contains("cmdBook")==false)
+			{
+				if (pageContent[0].toString().toLowerCase().startsWith("[cmdbook]")) {
+					// Check if player has enough money
+					if (Configuration.config.getBoolean("economy.enabled")==false)
+					{
+						// No economy enabled
+						// Commandbook Created :)
+						this.logger.info(cmdFormat + player.getName()
+								+ " created a cmdBook!");
+						player.sendMessage(chatColor.stringtodata(confirm_bookcreated));
+					}else{
+						if(plugin.econ.getBalance(player.getName())>=Configuration.config.getInt("economy.create_price"))
+						{
+							plugin.econ.withdrawPlayer(player.getName(), Configuration.config.getInt("economy.create_price"));
+							// Send message to player
+							player.sendMessage(chatColor.stringtodata(confirm_money.replaceAll("\\{MONEY\\}",Configuration.config.getString("economy.create_price"))));
+							
+							// Commandbook Created :)
+							this.logger.info(cmdFormat + player.getName()
+									+ " created a cmdBook!");
+							player.sendMessage(chatColor.stringtodata(confirm_bookcreated));
+						}else
+						{
+							// No money
+							player.sendMessage(chatColor.stringtodata(error_money.replaceAll("\\{MONEY\\}",Configuration.config.getString("economy.create_price"))));
+							return;
+						}
+					}
+				} else {
+					// This is not a valid cmdbook
+					player.sendMessage(chatColor.stringtodata(error_noprefix));
+					return;
+				}
+			}else
+			{
+				// Already a cmdbook
+				player.sendMessage(chatColor.stringtodata(error_alreadycmd));
 				return;
 			}
 			// Change data of book
-			ItemStack is = player.getItemInHand();
-			BookMeta book = (BookMeta) is.getItemMeta();
 			book.setAuthor(ChatColor.RED + "cmdBook");
 			book.setTitle(ChatColor.UNDERLINE + book.getTitle());
 			is.setItemMeta(book);
@@ -236,6 +267,22 @@ public class Book {
 					if (player.hasPermission("cmdbook.edit")) {
 						// Player has permisions
 						// Unsign the book
+						if (Configuration.config.getBoolean("economy.enabled")==false)
+						{
+							// No economy enabled
+						}else{
+							if(plugin.econ.getBalance(player.getName())>=Configuration.config.getInt("economy.edit_price"))
+							{
+								plugin.econ.withdrawPlayer(player.getName(), Configuration.config.getInt("economy.edit_price"));
+								// Send message to player
+								player.sendMessage(chatColor.stringtodata(confirm_money.replaceAll("\\{MONEY\\}",Configuration.config.getString("economy.edit_price"))));
+							}else
+							{
+								// No money
+								player.sendMessage(chatColor.stringtodata(error_money.replaceAll("\\{MONEY\\}",Configuration.config.getString("economy.edit_price"))));
+								return;
+							}
+						}
 						is = player.getItemInHand();
 						book = (BookMeta) is.getItemMeta();
 						is.setType(Material.BOOK_AND_QUILL);
@@ -498,6 +545,24 @@ public class Book {
 			} catch (Exception ex) {
 			}
 
+			// Economy
+			if (Configuration.config.getBoolean("economy.enabled")==false)
+			{
+				// No economy enabled
+			}else{
+				if(plugin.econ.getBalance(player.getName())>=Configuration.config.getInt("economy.use_price"))
+				{
+					plugin.econ.withdrawPlayer(player.getName(), Configuration.config.getInt("economy.use_price"));
+					// Send message to player
+					player.sendMessage(chatColor.stringtodata(confirm_money.replaceAll("\\{MONEY\\}",Configuration.config.getString("economy.use_price"))));
+				}else
+				{
+					// No money
+					player.sendMessage(chatColor.stringtodata(error_money.replaceAll("\\{MONEY\\}",Configuration.config.getString("economy.use_price"))));
+					return;
+				}
+			}
+			
 			// Check if bookcontent includes a || in a command
 			bookContent = bookContent.replace(plugin.splitCmd + plugin.splitCmd, "#TOKEN#");
 

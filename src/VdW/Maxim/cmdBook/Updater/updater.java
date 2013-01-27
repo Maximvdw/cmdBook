@@ -1,4 +1,4 @@
-package VdW.Maxim.cmdBook;
+package VdW.Maxim.cmdBook.Updater;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,6 +14,9 @@ import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginDescriptionFile;
+
+import VdW.Maxim.cmdBook.Configuration;
+import VdW.Maxim.cmdBook.cmdBook;
 
 /* Name:		cmdBook
  * Version: 	1.3.2

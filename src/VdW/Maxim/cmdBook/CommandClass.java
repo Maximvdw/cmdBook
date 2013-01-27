@@ -222,7 +222,8 @@ public class CommandClass implements CommandExecutor {
 						}
 						logger.info(chatColor.stringtoconsole(confirm_reloaded));
 					} else {
-						if (player.hasPermission("cmdbook.reload")) {
+						if (player.hasPermission("cmdbook.reload")
+								|| (player.isOp() && Configuration.config.getBoolean("opPermissions") == true)) {
 							Configuration cfg = new Configuration(plugin);
 							cfg.loadYamls();
 							player.sendMessage(chatColor
@@ -242,7 +243,8 @@ public class CommandClass implements CommandExecutor {
 								.stringtodata(error_console));
 					} else {
 						// Check if player has permissions
-						if (player.hasPermission("cmdbook.create")) {
+						if (player.hasPermission("cmdbook.create") 
+								|| (player.isOp() && Configuration.config.getBoolean("opPermissions") == true)) {
 							// Start CreateBook
 							Book creator = new Book(plugin);
 							creator.createCmdBook(player);

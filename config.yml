@@ -17,6 +17,18 @@ cmd_split: '|'
 # you cannot read a cmdBook
 executeOnRead: false
 
+opPermissions: true
+
+### ----- ECONOMY ------ ####
+# In order to use economy in cmdBook, you have
+# to install Vault (http://dev.bukkit.org/server-mods/vault/)
+economy:
+    enabled: false
+    create_price: 10
+    edit_price: 0
+    use_price: 0
+### -------------------- ####
+
 
 ### ----- UPDATING ----- ####
 # Check for updates. This will not update cmdBook 
@@ -32,4 +44,4 @@ autoUpdate: true
 
 # DO NOT EDIT THIS LINE
 # DOING SO WILL BREAK cmdBook!
-config: 3
+config: 4

@@ -20,6 +20,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import VdW.Maxim.cmdBook.Metrics.Metrics;
+import VdW.Maxim.cmdBook.Updater.updater;
 
 public class PlayerListener implements Listener {
 	// Create global variables

@@ -18,10 +18,10 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import VdW.Maxim.cmdBook.Metrics.Metrics;
+import VdW.Maxim.cmdBook.Updater.updater;
 
 // Vault
 import net.milkbowl.vault.economy.Economy;
-import net.milkbowl.vault.economy.EconomyResponse;
 
 public class cmdBook extends JavaPlugin {
 	// Create global variables
@@ -29,14 +29,14 @@ public class cmdBook extends JavaPlugin {
 	public cmdBook plugin = this; // Plugin will now refer to cmdBook
 	private CommandClass CommandListener; // Wait for commands in a different
 											// class
-	public static int config_version = 3; // Configuration version
+	public static int config_version = 4; // Configuration version
 	public static int cb_buildversion = 147; // The craftbukkit version, this app was build for
 	public String splitCmd = "|"; // The default split command char
 	public boolean allowChat = true; // Allow chat to be executed in cmdBooks
 	public final PlayerListener pl = new PlayerListener(this);
 
 	// Vault variables
-    public static Economy econ = null;
+    public Economy econ = null;
 
 	
 	@Override
