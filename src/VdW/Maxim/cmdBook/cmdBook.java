@@ -10,12 +10,18 @@ import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import VdW.Maxim.cmdBook.Metrics.Metrics;
+
+// Vault
+import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.economy.EconomyResponse;
 
 public class cmdBook extends JavaPlugin {
 	// Create global variables
@@ -23,10 +29,16 @@ public class cmdBook extends JavaPlugin {
 	public cmdBook plugin = this; // Plugin will now refer to cmdBook
 	private CommandClass CommandListener; // Wait for commands in a different
 											// class
+	public static int config_version = 3; // Configuration version
+	public static int cb_buildversion = 147; // The craftbukkit version, this app was build for
 	public String splitCmd = "|"; // The default split command char
 	public boolean allowChat = true; // Allow chat to be executed in cmdBooks
 	public final PlayerListener pl = new PlayerListener(this);
 
+	// Vault variables
+    public static Economy econ = null;
+
+	
 	@Override
 	public void onEnable() {
 		// PUT THIS INTO EVERY METHOD
@@ -40,6 +52,21 @@ public class cmdBook extends JavaPlugin {
 		// Show plugin information in console
 		this.logger.info(cmdFormat + "Made by: Maxim Van de Wynckel");
 
+		// Check for version errors
+		int cb_version = Integer.parseInt(Bukkit.getBukkitVersion().substring(0, Bukkit.getBukkitVersion().indexOf("-")).replaceAll("\\.", ""));
+		if (cb_version!=cb_buildversion){
+			this.logger.severe(cmdFormat + "cmdBook was not made for this craftbook version!");
+		}
+		// Show craftbook version
+		this.logger.info(cmdFormat + "Using craftbukkit: " + Bukkit.getBukkitVersion().substring(0, Bukkit.getBukkitVersion().indexOf("-")));
+		
+		// Check for vault hook
+        if (!setupEconomy()) {
+        	this.logger.info(cmdFormat + "No economy system found! Disabling feature...");
+        }else{
+        	this.logger.info(cmdFormat + "Economy system found!");
+        }
+		
 		// Start Player listener
 		this.logger.info(cmdFormat + "Starting player listener...");
 		PluginManager pm = getServer().getPluginManager();
@@ -52,7 +79,6 @@ public class cmdBook extends JavaPlugin {
 		// List all commands that have to be heard by the Command Listener
 		try{
 			getCommand("cb").setExecutor(CommandListener);	
-			getCommand("cmdbook").setExecutor(CommandListener); // Might be used by CommandBook
 		}catch (Exception ex){
 			// Error while enabling the commands
 			// Do not show this cuz its a compatibility bug
@@ -85,6 +111,11 @@ public class cmdBook extends JavaPlugin {
 		try{
 			Configuration.config = new YamlConfiguration();
 			configClass.loadYamls();
+			if (Configuration.config.getInt("config")!=config_version)
+			{
+				this.logger.info(cmdFormat + "Updating configuration...");
+				configClass.update();
+			}
 			this.splitCmd = Configuration.config.getString("cmd_split"); // Get split character
 			this.logger.info(cmdFormat + "Using split character '" + splitCmd + "'");
 			if (splitCmd == "")
@@ -116,4 +147,18 @@ public class cmdBook extends JavaPlugin {
 	public void onDisable() {
 
 	}
+	
+	// Economy
+	 private boolean setupEconomy() {
+	        if (getServer().getPluginManager().getPlugin("Vault") == null) {
+	            return false;
+	        }
+	        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+	        if (rsp == null) {
+	            return false;
+	        }
+	        econ = rsp.getProvider();
+	        return econ != null;
+	    }
+
 }

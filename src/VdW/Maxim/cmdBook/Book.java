@@ -175,6 +175,9 @@ public class Book {
 			// The player is holding a book
 			// Check if it is a valid cmdBook
 			Object pageContent[] = getBookContent(player);
+			// Check if all variables are allowed
+			
+			
 			if (pageContent[0].toString().toLowerCase().startsWith("[cmdbook]")) {
 				// Commandbook Created :)
 				this.logger.info(cmdFormat + player.getName()

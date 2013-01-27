@@ -56,6 +56,32 @@ public class Configuration {
 					.severe(cmdFormat + "Unable to copy the config files!");
 		}
 	}
+	
+	public void update() throws Exception {
+		// Load String Shortcuts
+		// Put plugin at the start of every routine
+		PluginDescriptionFile pdfFile = plugin.getDescription();
+		String cmdFormat = "[" + pdfFile.getName() + "] ";
+		//
+
+		try {
+				configFile.getParentFile().mkdirs(); // creates the
+														// /plugins/<pluginName>/
+														// directory if not
+														// found
+				plugin.logger.info(cmdFormat + "Copying config.yml file!");
+				copy(plugin.getResource("config.yml"), configFile); // copies
+																	// the yaml
+																	// from
+				// your jar to the
+				// folder
+				// /plugin/<pluginName>
+		} catch (Exception ex) {
+			// Critical error
+			plugin.logger
+					.severe(cmdFormat + "Unable to copy the config files!");
+		}
+	}
 
 	/*
 	 * plugin copy(); method copies the specified file from your jar to your

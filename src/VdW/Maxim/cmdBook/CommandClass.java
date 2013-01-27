@@ -34,6 +34,7 @@ public class CommandClass implements CommandExecutor {
 	static String error_nobook = "&cYou can only use this command on a Written book!";
 	static String error_noauthor = "&cOnly the author of this book can protect it!";
 	static String error_noauthor2 = "&cOnly the author of this book can make it public!";
+	static String error_nopage = "&cUnable to find that page!";
 
 	// Confirm messages
 	static String confirm_private = "&aYour book has been made private!";
@@ -80,6 +81,41 @@ public class CommandClass implements CommandExecutor {
 					// Show HELP
 					help help = new help(plugin);
 					help.cmdbook_help(player);
+				} else if (argument.equalsIgnoreCase("variables")) {
+					if (args.length == 1) {
+						// Show HELP page 1
+						help help = new help(plugin);
+						help.cmdbook_variables_page1(player);
+					}else{
+						argument = args[1];
+						if (argument.equalsIgnoreCase("1"))
+						{
+							// Show HELP page 1
+							help help = new help(plugin);
+							help.cmdbook_variables_page1(player);
+						}
+						else if (argument.equalsIgnoreCase("2"))
+						{
+							// Show HELP page 2
+							help help = new help(plugin);
+							help.cmdbook_variables_page2(player);
+						}
+						else if (argument.equalsIgnoreCase("3"))
+						{
+							// Show HELP page 3
+							help help = new help(plugin);
+							help.cmdbook_variables_page3(player);
+						}
+						else if (argument.equalsIgnoreCase("4"))
+						{
+							// Show HELP page 4
+							help help = new help(plugin);
+							help.cmdbook_variables_page4(player);
+						}else{
+							player.sendMessage(chatColor
+									.stringtodata(error_nopage));
+						}
+					}
 				} else if (argument.equalsIgnoreCase("convert")) {
 					try {
 						if (player == null) {

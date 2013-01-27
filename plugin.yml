@@ -1,6 +1,6 @@
 name: cmdBook
 main: VdW.Maxim.cmdBook.cmdBook
-version: 1.3.2
+version: 1.3.3
 website: http://dev.bukkit.org/server-mods/cmdBook/
 author: Maximvdw
 description: Execute multiple commands in a book
@@ -88,6 +88,10 @@ permissions:
             cmdbook.reload: true
             cmdbook.input: true
             cmdbook.convert: true
+            cmdbook.update: true
+    cmdbook.update:
+        description: Get notified on update messages
+        default: op
     cmdbook.convert:
         description: Convert deprecated variables
         default: true
