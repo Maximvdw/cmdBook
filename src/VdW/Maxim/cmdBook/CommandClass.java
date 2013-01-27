@@ -247,7 +247,7 @@ public class CommandClass implements CommandExecutor {
 								|| (player.isOp() && Configuration.config.getBoolean("opPermissions") == true)) {
 							// Start CreateBook
 							Book creator = new Book(plugin);
-							creator.createCmdBook(player);
+							creator.createCmdBook(player,player.getItemInHand());
 						} else {
 							// No permission
 							player.sendMessage(chatColor
@@ -269,7 +269,7 @@ public class CommandClass implements CommandExecutor {
 						if (player.hasPermission("cmdbook.edit")) {
 							// Start CreateBook
 							Book creator = new Book(plugin);
-							creator.editBook(player);
+							creator.editBook(player,player.getItemInHand());
 						} else {
 							// No permission
 							player.sendMessage(chatColor
@@ -287,7 +287,7 @@ public class CommandClass implements CommandExecutor {
 						if (player.hasPermission("cmdbook.info")) {
 							// Start CreateBook
 							Book creator = new Book(plugin);
-							creator.infocmdBook(player);
+							creator.infocmdBook(player,player.getItemInHand());
 						} else {
 							// No permission
 							player.sendMessage(chatColor

@@ -27,9 +27,9 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import VdW.Maxim.cmdBook.cmdBook;
 
 /* Name:		cmdBook
- * Version: 	1.3.1
+ * Version: 	1.4.0
  * Made by: 	Maxim Van de Wynckel
- * Build date:	10/01/2013						
+ * Build date:	28/01/2013						
  */
 
 public class Book {
@@ -65,7 +65,7 @@ public class Book {
 	static String cmdbook_info = "&6----[ cmdBook Info ]----\n"
 			+ "&aBook Title: &f";
 
-	public void infocmdBook(Player player) {
+	public void infocmdBook(Player player, ItemStack item) {
 		// PUT THIS INTO EVERY METHOD
 		PluginDescriptionFile pdfFile = plugin.getDescription();
 		@SuppressWarnings("unused")
@@ -78,18 +78,18 @@ public class Book {
 		// In order to edit a book, the book has to
 		// be unsigned, so it can be used for editing again
 		// Get the item
-		ItemStack is = player.getItemInHand();
+		ItemStack is = item;
 		BookMeta book = (BookMeta) is.getItemMeta();
 		if (is.getTypeId() == 387) {
 			// check if the valid yet
 			String authorPlugin = (ChatColor.RED + "cmdBook").toString();
-			Object[] pageContent = getBookContent(player);
+			Object[] pageContent = getBookContent(player,item);
 			if (pageContent[0].toString().toLowerCase().startsWith("[cmdbook]")
 					& book.getAuthor().equalsIgnoreCase(authorPlugin)) {
 
 			}
 			// Get contents
-			Object pageContents[] = getBookContent(player);
+			Object pageContents[] = getBookContent(player,item);
 			// Remove the [cmdbook]
 			pageContents[0] = pageContents[0].toString().substring(
 					"[cmdbook]".length());
@@ -159,7 +159,7 @@ public class Book {
 		}
 	}
 
-	public void createCmdBook(Player player) {
+	public void createCmdBook(Player player,ItemStack item) {
 		// PUT THIS INTO EVERY METHOD
 		PluginDescriptionFile pdfFile = plugin.getDescription();
 		String cmdFormat = "[" + pdfFile.getName() + "] ";
@@ -168,7 +168,7 @@ public class Book {
 		// In order to edit a book, the book has to
 		// be unsigned, so it can be used for editing again
 		// Get the item
-		ItemStack stack = (ItemStack) player.getItemInHand();
+		ItemStack stack = item;
 		if (stack.getTypeId() == 386) {
 			// The book is not signed yet
 			// Warn player
@@ -177,7 +177,7 @@ public class Book {
 		} else if (stack.getTypeId() == 387) {
 			// The player is holding a book
 			// Check if it is a valid cmdBook
-			Object pageContent[] = getBookContent(player);
+			Object pageContent[] = getBookContent(player,item);
 			// Check if all variables are allowed
 			ItemStack is = player.getItemInHand();
 			BookMeta book = (BookMeta) is.getItemMeta();
@@ -232,7 +232,7 @@ public class Book {
 		}
 	}
 
-	public void editBook(Player player) {
+	public void editBook(Player player, ItemStack item) {
 		// PUT THIS INTO EVERY METHOD
 		PluginDescriptionFile pdfFile = plugin.getDescription();
 		String cmdFormat = "[" + pdfFile.getName() + "] ";
@@ -243,14 +243,14 @@ public class Book {
 		// if it is a valid cmdBook
 
 		// Get the item the player has in his hand
-		ItemStack is = player.getItemInHand();
+		ItemStack is = item;
 		BookMeta book = (BookMeta) is.getItemMeta();
 
 		// Check if the player is holding a book
 		if (is.getTypeId() == 387) {
 			// Player is holding a book
 			// Now check if it is a cmdBook
-			Object pageContent[] = getBookContent(player);
+			Object pageContent[] = getBookContent(player,item);
 
 			// Now read author
 			String authorPlugin = (ChatColor.RED + "cmdBook").toString(); // The
@@ -316,7 +316,7 @@ public class Book {
 	String answer = "";
 
 	@SuppressWarnings("static-access")
-	public void performCommands(Player player) {
+	public void performCommands(Player player,ItemStack item) {
 		// PUT THIS INTO EVERY METHOD
 		PluginDescriptionFile pdfFile = plugin.getDescription();
 		String cmdFormat = "[" + pdfFile.getName() + "] ";
@@ -326,7 +326,7 @@ public class Book {
 		// The player is holding
 
 		// Get contents
-		Object pageContents[] = getBookContent(player);
+		Object pageContents[] = getBookContent(player,item);
 		// Remove the [cmdbook]
 		pageContents[0] = pageContents[0].toString().substring(
 				"[cmdbook]".length());
@@ -388,26 +388,6 @@ public class Book {
 				if (player.hasPermission("cmdbook.use.health")) {
 					bookContent = bookContent.replace("$health",
 							"" + player.getHealth());
-				} else {
-					// No permissions
-					player.sendMessage(chatColor.stringtodata(error_permission));
-				}
-			} catch (Exception ex) {
-			}
-			try {
-				if (player.hasPermission("cmdbook.use.xp")) {
-					bookContent = bookContent.replace("$xp",
-							"" + player.getExp());
-				} else {
-					// No permissions
-					player.sendMessage(chatColor.stringtodata(error_permission));
-				}
-			} catch (Exception ex) {
-			}
-			try {
-				if (player.hasPermission("cmdbook.use.targetxp")) {
-					bookContent = bookContent.replace("$targetxp", ""
-							+ getTarget(player).getExp());
 				} else {
 					// No permissions
 					player.sendMessage(chatColor.stringtodata(error_permission));
@@ -495,6 +475,16 @@ public class Book {
 			} catch (Exception ex) {
 			}
 			try {
+				if (player.hasPermission("cmdbook.use.zpos")) {
+					bookContent = bookContent.replace("$zpos", ""
+							+ player.getLocation().getZ());
+				} else {
+					// No permissions
+					player.sendMessage(chatColor.stringtodata(error_permission));
+				}
+			} catch (Exception ex) {
+			}
+			try {
 				if (player.hasPermission("cmdbook.use.targetxpos")) {
 					bookContent = bookContent.replace("$targetxpos", ""
 							+ getTarget(player).getLocation().getX());
@@ -508,6 +498,16 @@ public class Book {
 				if (player.hasPermission("cmdbook.use.targetypos")) {
 					bookContent = bookContent.replace("$targetypos", ""
 							+ getTarget(player).getLocation().getY());
+				} else {
+					// No permissions
+					player.sendMessage(chatColor.stringtodata(error_permission));
+				}
+			} catch (Exception ex) {
+			}
+			try {
+				if (player.hasPermission("cmdbook.use.targetzpos")) {
+					bookContent = bookContent.replace("$targetzpos", ""
+							+ getTarget(player).getLocation().getZ());
 				} else {
 					// No permissions
 					player.sendMessage(chatColor.stringtodata(error_permission));
@@ -544,23 +544,48 @@ public class Book {
 				}
 			} catch (Exception ex) {
 			}
+			try {
+				if (player.hasPermission("cmdbook.use.xp")) {
+					bookContent = bookContent.replace("$xp",
+							"" + player.getExp());
+				} else {
+					// No permissions
+					player.sendMessage(chatColor.stringtodata(error_permission));
+				}
+			} catch (Exception ex) {
+			}
+			try {
+				if (player.hasPermission("cmdbook.use.targetxp")) {
+					bookContent = bookContent.replace("$targetxp", ""
+							+ getTarget(player).getExp());
+				} else {
+					// No permissions
+					player.sendMessage(chatColor.stringtodata(error_permission));
+				}
+			} catch (Exception ex) {
+			}
 
 			// Economy
-			if (Configuration.config.getBoolean("economy.enabled")==false)
-			{
-				// No economy enabled
-			}else{
-				if(plugin.econ.getBalance(player.getName())>=Configuration.config.getInt("economy.use_price"))
+			try{
+				if (Configuration.config.getBoolean("economy.enabled")==false)
 				{
-					plugin.econ.withdrawPlayer(player.getName(), Configuration.config.getInt("economy.use_price"));
-					// Send message to player
-					player.sendMessage(chatColor.stringtodata(confirm_money.replaceAll("\\{MONEY\\}",Configuration.config.getString("economy.use_price"))));
-				}else
-				{
-					// No money
-					player.sendMessage(chatColor.stringtodata(error_money.replaceAll("\\{MONEY\\}",Configuration.config.getString("economy.use_price"))));
-					return;
+					// No economy enabled
+				}else{
+					if(plugin.econ.getBalance(player.getName())>=Configuration.config.getInt("economy.use_price"))
+					{
+						plugin.econ.withdrawPlayer(player.getName(), Configuration.config.getInt("economy.use_price"));
+						// Send message to player
+						player.sendMessage(chatColor.stringtodata(confirm_money.replaceAll("\\{MONEY\\}",Configuration.config.getString("economy.use_price"))));
+					}else
+					{
+						// No money
+						player.sendMessage(chatColor.stringtodata(error_money.replaceAll("\\{MONEY\\}",Configuration.config.getString("economy.use_price"))));
+						return;
+					}
 				}
+			}catch (Exception ex)
+			{
+				// Error
 			}
 			
 			// Check if bookcontent includes a || in a command
@@ -1089,7 +1114,7 @@ public class Book {
 		return null;
 	}
 	
-	public Object[] getBookContent(Player player) {
+	public Object[] getBookContent(Player player, ItemStack item) {
 		// PUT THIS INTO EVERY METHOD
 		PluginDescriptionFile pdfFile = plugin.getDescription();
 		String cmdFormat = "[" + pdfFile.getName() + "] ";
@@ -1101,7 +1126,7 @@ public class Book {
 		Object pageContents[] = null;
 		try {
 			// Get the item the player has in his hand
-			ItemStack is = player.getItemInHand();
+			ItemStack is = item;
 
 			// Now read each page content
 			BookMeta book = (BookMeta) is.getItemMeta();

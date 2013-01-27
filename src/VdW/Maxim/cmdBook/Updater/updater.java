@@ -19,9 +19,9 @@ import VdW.Maxim.cmdBook.Configuration;
 import VdW.Maxim.cmdBook.cmdBook;
 
 /* Name:		cmdBook
- * Version: 	1.3.2
+ * Version: 	1.3.3
  * Made by: 	Maxim Van de Wynckel
- * Build date:	26/01/2013						
+ * Build date:	27/01/2013						
  */
 
 public class updater {
@@ -50,7 +50,7 @@ public class updater {
 		try {
 			URL url = new URL("http://dev.bukkit.org/server-mods/" + devName);
 			InputStream is = url.openConnection().getInputStream();
-			
+
 			BufferedReader reader = new BufferedReader(
 					new InputStreamReader(is));
 			// Get version as string with .=-
@@ -59,12 +59,14 @@ public class updater {
 					Bukkit.getBukkitVersion().indexOf("-"));
 
 			String line = null;
-			String regExp = ".*<a href=\"(.*/server-mods/" + devName
-					+ "/files/.*-" + devFileSplit + "-.*)\">.*" + craftbookV + ".*";
+			String regExp = "<a href=\"(/server-mods/" + devName + "/files/"
+					+ "(0|(\\+)?([1-9]{1}[0-9]{0,1}|[1]{1}[0-9]{0,2}|[2]{1}([0-4]"
+					+ "{1}[0-9]{1}|[5]{1}[0-5]{1})))-" + devFileSplit + "-[0-9]-[0-9]-[0-9]"
+					+ "/)\\\">" + devName + " [0-9].[0-9].[0-9]</a> for CB " + craftbookV;
 			Pattern p = Pattern.compile(regExp, Pattern.CASE_INSENSITIVE);
 			while ((line = reader.readLine()) != null) {
 				Matcher m = p.matcher(line);
-				if (m.matches()) {
+				if (m.find()) {
 					if (!m.group(1).toString().contains(versionStr)) {
 						// Outdated
 						this.logger.warning(cmdFormat
@@ -176,7 +178,8 @@ public class updater {
 			reader.close();
 
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			this.logger
+			.warning(cmdFormat + "Unable to check for updates!");
 		}
 	}
 }

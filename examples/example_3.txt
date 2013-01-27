@@ -1,0 +1,4 @@
+[cmdbook]
+$msg[&2Example Book]|
+$msg[&aBanning a player]|
+/ban $input[&cPlayer Name:] $input[&4Reason:]
