@@ -213,6 +213,11 @@ permissions:
         default: true
         children:
             cmdbook.use.losz: true
+    cmdbook.variable.effect:
+        description: Allows a user to add effect variable
+        default: op
+        children:
+            cmdbook.use.effect: true
     cmdbook.variable.runconsole:
         description: Allows a user to add the variable to let the console run the commands
         default: op

@@ -13,6 +13,7 @@ import javax.script.ScriptEngineManager;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Effect;
 import org.bukkit.Material;
 import org.bukkit.conversations.Conversation;
 import org.bukkit.conversations.ConversationAbandonedEvent;
@@ -50,7 +51,7 @@ public class Book {
 	static String error_noprefix = "&cYou have to start your book with &4[cmdbook]&c!";
 	static String error_money = "&2[&fcmdBook&2] &cYou do not have {MONEY}$!";
 	static String error_alreadycmd = "&cThis is already a cmdBook!";
-
+	static String error_effect = "&cThe effect {EFFECT} is not valid. Use BLAZE_SHOOT BOW_FIRE CLICK1 CLICK2 DOOR_TOGGLE ENDER_SIGNAL EXTINGUISH GHAST_SHOOT GHAST_SHRIEK MOBSPAWNER_FLAMES POTION_BREAK RECORD_PLAY SMOKE STEP_SOUND ZOMBIE_CHEW_IRON_DOOR ZOMBIE_CHEW_WOODEN_DOOR ZOMBIE_DESTROY_DOOR";
 	// Confirm messages (Handy for other languages)
 	static String confirm_bookcreated = "&aYour cmdBook has been created!";
 	static String confirm_unsigned = "&aYour cmdBook has been unsigned!";
@@ -83,13 +84,13 @@ public class Book {
 		if (is.getTypeId() == 387) {
 			// check if the valid yet
 			String authorPlugin = (ChatColor.RED + "cmdBook").toString();
-			Object[] pageContent = getBookContent(player,item);
+			Object[] pageContent = getBookContent(player, item);
 			if (pageContent[0].toString().toLowerCase().startsWith("[cmdbook]")
 					& book.getAuthor().equalsIgnoreCase(authorPlugin)) {
 
 			}
 			// Get contents
-			Object pageContents[] = getBookContent(player,item);
+			Object pageContents[] = getBookContent(player, item);
 			// Remove the [cmdbook]
 			pageContents[0] = pageContents[0].toString().substring(
 					"[cmdbook]".length());
@@ -99,10 +100,8 @@ public class Book {
 			String bookContent = "";
 			for (int i = 0; i < pageContents.length; i++) {
 				ScriptEngineManager mgr = new ScriptEngineManager();
-				ScriptEngine engine = mgr
-						.getEngineByName("javascript");
-				Pattern regex = Pattern
-						.compile("calc\\((.*?)\\)");
+				ScriptEngine engine = mgr.getEngineByName("javascript");
+				Pattern regex = Pattern.compile("calc\\((.*?)\\)");
 				Matcher regexMatcher = regex.matcher(pageContent[i].toString());
 				while (regexMatcher.find()) {
 					for (int x = 1; x <= regexMatcher.groupCount(); x++) {
@@ -111,17 +110,20 @@ public class Book {
 							// match start: regexMatcher.start(i)
 							// match end: regexMatcher.end(i)
 							engine.getBindings(ScriptContext.ENGINE_SCOPE);
-							commandList += "&4'calc(" + regexMatcher.group(x).toString() + ")' is deprecated!\nUse /cb convert to fix this issue\n";
+							commandList += "&4'calc("
+									+ regexMatcher.group(x).toString()
+									+ ")' is deprecated!\nUse /cb convert to fix this issue\n";
 						} catch (Exception ex) {
 							ex.printStackTrace();
 						}
 					}
 				}
-				
+
 				// Make one string of all those pages
 				bookContent = pageContents[i].toString().replace("\n", "");
 				// Check if bookcontent includes a || in a command
-				bookContent = bookContent.replace(plugin.splitCmd + plugin.splitCmd, "#TOKEN#");
+				bookContent = bookContent.replace(plugin.splitCmd
+						+ plugin.splitCmd, "#TOKEN#");
 
 				if (bookContent.toLowerCase().contains("@runconsole")) {
 					bookContent = bookContent.replace("@runconsole", "");
@@ -159,7 +161,7 @@ public class Book {
 		}
 	}
 
-	public void createCmdBook(Player player,ItemStack item) {
+	public void createCmdBook(Player player, ItemStack item) {
 		// PUT THIS INTO EVERY METHOD
 		PluginDescriptionFile pdfFile = plugin.getDescription();
 		String cmdFormat = "[" + pdfFile.getName() + "] ";
@@ -177,36 +179,46 @@ public class Book {
 		} else if (stack.getTypeId() == 387) {
 			// The player is holding a book
 			// Check if it is a valid cmdBook
-			Object pageContent[] = getBookContent(player,item);
+			Object pageContent[] = getBookContent(player, item);
 			// Check if all variables are allowed
 			ItemStack is = player.getItemInHand();
 			BookMeta book = (BookMeta) is.getItemMeta();
-			if (book.getAuthor().contains("cmdBook")==false)
-			{
-				if (pageContent[0].toString().toLowerCase().startsWith("[cmdbook]")) {
+			if (book.getAuthor().contains("cmdBook") == false) {
+				if (pageContent[0].toString().toLowerCase()
+						.startsWith("[cmdbook]")) {
 					// Check if player has enough money
-					if (Configuration.config.getBoolean("economy.enabled")==false)
-					{
+					if (Configuration.config.getBoolean("economy.enabled") == false) {
 						// No economy enabled
 						// Commandbook Created :)
 						this.logger.info(cmdFormat + player.getName()
 								+ " created a cmdBook!");
-						player.sendMessage(chatColor.stringtodata(confirm_bookcreated));
-					}else{
-						if(plugin.econ.getBalance(player.getName())>=Configuration.config.getInt("economy.create_price"))
-						{
-							plugin.econ.withdrawPlayer(player.getName(), Configuration.config.getInt("economy.create_price"));
+						player.sendMessage(chatColor
+								.stringtodata(confirm_bookcreated));
+					} else {
+						if (plugin.econ.getBalance(player.getName()) >= Configuration.config
+								.getInt("economy.create_price")) {
+							plugin.econ.withdrawPlayer(player.getName(),
+									Configuration.config
+											.getInt("economy.create_price"));
 							// Send message to player
-							player.sendMessage(chatColor.stringtodata(confirm_money.replaceAll("\\{MONEY\\}",Configuration.config.getString("economy.create_price"))));
-							
+							player.sendMessage(chatColor.stringtodata(confirm_money
+									.replaceAll(
+											"\\{MONEY\\}",
+											Configuration.config
+													.getString("economy.create_price"))));
+
 							// Commandbook Created :)
 							this.logger.info(cmdFormat + player.getName()
 									+ " created a cmdBook!");
-							player.sendMessage(chatColor.stringtodata(confirm_bookcreated));
-						}else
-						{
+							player.sendMessage(chatColor
+									.stringtodata(confirm_bookcreated));
+						} else {
 							// No money
-							player.sendMessage(chatColor.stringtodata(error_money.replaceAll("\\{MONEY\\}",Configuration.config.getString("economy.create_price"))));
+							player.sendMessage(chatColor.stringtodata(error_money
+									.replaceAll(
+											"\\{MONEY\\}",
+											Configuration.config
+													.getString("economy.create_price"))));
 							return;
 						}
 					}
@@ -215,8 +227,7 @@ public class Book {
 					player.sendMessage(chatColor.stringtodata(error_noprefix));
 					return;
 				}
-			}else
-			{
+			} else {
 				// Already a cmdbook
 				player.sendMessage(chatColor.stringtodata(error_alreadycmd));
 				return;
@@ -250,7 +261,7 @@ public class Book {
 		if (is.getTypeId() == 387) {
 			// Player is holding a book
 			// Now check if it is a cmdBook
-			Object pageContent[] = getBookContent(player,item);
+			Object pageContent[] = getBookContent(player, item);
 
 			// Now read author
 			String authorPlugin = (ChatColor.RED + "cmdBook").toString(); // The
@@ -267,19 +278,27 @@ public class Book {
 					if (player.hasPermission("cmdbook.edit")) {
 						// Player has permisions
 						// Unsign the book
-						if (Configuration.config.getBoolean("economy.enabled")==false)
-						{
+						if (Configuration.config.getBoolean("economy.enabled") == false) {
 							// No economy enabled
-						}else{
-							if(plugin.econ.getBalance(player.getName())>=Configuration.config.getInt("economy.edit_price"))
-							{
-								plugin.econ.withdrawPlayer(player.getName(), Configuration.config.getInt("economy.edit_price"));
+						} else {
+							if (plugin.econ.getBalance(player.getName()) >= Configuration.config
+									.getInt("economy.edit_price")) {
+								plugin.econ.withdrawPlayer(player.getName(),
+										Configuration.config
+												.getInt("economy.edit_price"));
 								// Send message to player
-								player.sendMessage(chatColor.stringtodata(confirm_money.replaceAll("\\{MONEY\\}",Configuration.config.getString("economy.edit_price"))));
-							}else
-							{
+								player.sendMessage(chatColor.stringtodata(confirm_money
+										.replaceAll(
+												"\\{MONEY\\}",
+												Configuration.config
+														.getString("economy.edit_price"))));
+							} else {
 								// No money
-								player.sendMessage(chatColor.stringtodata(error_money.replaceAll("\\{MONEY\\}",Configuration.config.getString("economy.edit_price"))));
+								player.sendMessage(chatColor.stringtodata(error_money
+										.replaceAll(
+												"\\{MONEY\\}",
+												Configuration.config
+														.getString("economy.edit_price"))));
 								return;
 							}
 						}
@@ -316,7 +335,7 @@ public class Book {
 	String answer = "";
 
 	@SuppressWarnings("static-access")
-	public void performCommands(Player player,ItemStack item) {
+	public void performCommands(Player player, ItemStack item) {
 		// PUT THIS INTO EVERY METHOD
 		PluginDescriptionFile pdfFile = plugin.getDescription();
 		String cmdFormat = "[" + pdfFile.getName() + "] ";
@@ -326,7 +345,7 @@ public class Book {
 		// The player is holding
 
 		// Get contents
-		Object pageContents[] = getBookContent(player,item);
+		Object pageContents[] = getBookContent(player, item);
 		// Remove the [cmdbook]
 		pageContents[0] = pageContents[0].toString().substring(
 				"[cmdbook]".length());
@@ -566,30 +585,34 @@ public class Book {
 			}
 
 			// Economy
-			try{
-				if (Configuration.config.getBoolean("economy.enabled")==false)
-				{
+			try {
+				if (Configuration.config.getBoolean("economy.enabled") == false) {
 					// No economy enabled
-				}else{
-					if(plugin.econ.getBalance(player.getName())>=Configuration.config.getInt("economy.use_price"))
-					{
-						plugin.econ.withdrawPlayer(player.getName(), Configuration.config.getInt("economy.use_price"));
+				} else {
+					if (plugin.econ.getBalance(player.getName()) >= Configuration.config
+							.getInt("economy.use_price")) {
+						plugin.econ.withdrawPlayer(player.getName(),
+								Configuration.config
+										.getInt("economy.use_price"));
 						// Send message to player
-						player.sendMessage(chatColor.stringtodata(confirm_money.replaceAll("\\{MONEY\\}",Configuration.config.getString("economy.use_price"))));
-					}else
-					{
+						player.sendMessage(chatColor.stringtodata(confirm_money
+								.replaceAll("\\{MONEY\\}", Configuration.config
+										.getString("economy.use_price"))));
+					} else {
 						// No money
-						player.sendMessage(chatColor.stringtodata(error_money.replaceAll("\\{MONEY\\}",Configuration.config.getString("economy.use_price"))));
+						player.sendMessage(chatColor.stringtodata(error_money
+								.replaceAll("\\{MONEY\\}", Configuration.config
+										.getString("economy.use_price"))));
 						return;
 					}
 				}
-			}catch (Exception ex)
-			{
+			} catch (Exception ex) {
 				// Error
 			}
-			
+
 			// Check if bookcontent includes a || in a command
-			bookContent = bookContent.replace(plugin.splitCmd + plugin.splitCmd, "#TOKEN#");
+			bookContent = bookContent.replace(
+					plugin.splitCmd + plugin.splitCmd, "#TOKEN#");
 
 			// Do a quick check to see how many commands need to be stored
 			for (int j = 1; j < bookContent.length() + 1; j++) {
@@ -901,9 +924,25 @@ public class Book {
 							this.logger.info(cmdFormat + player.getName()
 									+ " sleeping " + timewait);
 							Thread.currentThread().sleep(timewait);
+						} else if (command.toLowerCase().startsWith("$effect[")) {
+							if (player.hasPermission("cmdbook.use.effect")) {
+								// Private message
+								String sound = "";
+								sound = command.substring("$effect[".length(),
+										command.indexOf("]"));
+								try {
+									player.playEffect(player.getLocation(),
+											Effect.valueOf(sound), 5);
+									this.logger.info(cmdFormat
+											+ player.getName()
+											+ " played effect: " + sound);
+								} catch (Exception ex) {
+									player.sendMessage(chatColor
+											.stringtodata(error_effect));
+								}
+							}
 						} else if (command.toLowerCase().startsWith("$msg[")) {
-							if (player.hasPermission("cmdbook.use.message")
-									&& runConsole == true) {
+							if (player.hasPermission("cmdbook.use.message")) {
 								// Private message
 								String message = "";
 								message = command.substring("$msg[".length(),
@@ -915,8 +954,7 @@ public class Book {
 							}
 						} else if (command.toLowerCase().startsWith("$chat[")) {
 							// Chat perform
-							if (player.hasPermission("cmdbook.use.chat")
-									&& runConsole == true) {
+							if (player.hasPermission("cmdbook.use.chat")) {
 								String message = "";
 								message = command.substring("$chat[".length(),
 										command.indexOf("]"));
@@ -927,8 +965,7 @@ public class Book {
 						} else if (command.toLowerCase().startsWith(
 								"$broadcast[")) {
 							// broadcast a message
-							if (player.hasPermission("cmdbook.use.broadcast")
-									&& runConsole == true) {
+							if (player.hasPermission("cmdbook.use.broadcast")) {
 								String message = "";
 								message = command.substring(
 										"$broadcast[".length(),
@@ -1041,8 +1078,7 @@ public class Book {
 																			// cmdBook
 			// author
 			try {
-				if (pageContent.get(0).toLowerCase()
-						.startsWith("[cmdbook]")
+				if (pageContent.get(0).toLowerCase().startsWith("[cmdbook]")
 						& (book.getAuthor().equalsIgnoreCase(authorPlugin) || player
 								.hasPermission("cmdbook.public.all"))) {
 					// It is a cmdBook
@@ -1058,9 +1094,9 @@ public class Book {
 							ScriptEngineManager mgr = new ScriptEngineManager();
 							ScriptEngine engine = mgr
 									.getEngineByName("javascript");
-							Pattern regex = Pattern
-									.compile("calc\\((.*?)\\)");
-							Matcher regexMatcher = regex.matcher(pageContent.get(i));
+							Pattern regex = Pattern.compile("calc\\((.*?)\\)");
+							Matcher regexMatcher = regex.matcher(pageContent
+									.get(i));
 							while (regexMatcher.find()) {
 								for (int x = 1; x <= regexMatcher.groupCount(); x++) {
 									try {
@@ -1068,9 +1104,20 @@ public class Book {
 										// match start: regexMatcher.start(i)
 										// match end: regexMatcher.end(i)
 										engine.getBindings(ScriptContext.ENGINE_SCOPE);
-										book.setPage(i+1,pageContent.get(i).replace("calc("
-												+ regexMatcher.group(x)
-														.toString() + ")", "$calc[" + regexMatcher.group(x) + "]"));
+										book.setPage(
+												i + 1,
+												pageContent
+														.get(i)
+														.replace(
+																"calc("
+																		+ regexMatcher
+																				.group(x)
+																				.toString()
+																		+ ")",
+																"$calc["
+																		+ regexMatcher
+																				.group(x)
+																		+ "]"));
 									} catch (Exception ex) {
 										ex.printStackTrace();
 									}
@@ -1113,7 +1160,7 @@ public class Book {
 
 		return null;
 	}
-	
+
 	public Object[] getBookContent(Player player, ItemStack item) {
 		// PUT THIS INTO EVERY METHOD
 		PluginDescriptionFile pdfFile = plugin.getDescription();
