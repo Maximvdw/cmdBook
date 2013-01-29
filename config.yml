@@ -37,11 +37,12 @@ checkUpdates: true
 
 # Automatically update the plugin when its outdated
 # This will download the last craftbook compatible plugin
-autoUpdate: true
+autoUpdate: false
 # NOTE: This might break cmdBook when using an older craftbukkit
+# DO NOT USE THIS !!!!!!!!!! IT IS BUGGED
 ### -------------------- ####
 
 
 # DO NOT EDIT THIS LINE
 # DOING SO WILL BREAK cmdBook!
-config: 4
+config: 5
