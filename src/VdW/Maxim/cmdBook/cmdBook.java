@@ -34,6 +34,7 @@ public class cmdBook extends JavaPlugin {
 	public String splitCmd = "|"; // The default split command char
 	public boolean allowChat = true; // Allow chat to be executed in cmdBooks
 	public final PlayerListener pl = new PlayerListener(this);
+	public boolean economyFound = false;
 
 	// Vault variables
     public Economy econ = null;
@@ -62,8 +63,10 @@ public class cmdBook extends JavaPlugin {
 		
 		// Check for vault hook
         if (!setupEconomy()) {
+        	economyFound = false;
         	this.logger.info(cmdFormat + "No economy system found! Disabling feature...");
         }else{
+        	economyFound = true;
         	this.logger.info(cmdFormat + "Economy system found!");
         }
 		
@@ -129,7 +132,7 @@ public class cmdBook extends JavaPlugin {
 		}
 		
 		//Check for updates
-		if (Configuration.config.getBoolean("checkUpdates")==true || Configuration.config.getBoolean("autoUpdate")==true)
+		/*if (Configuration.config.getBoolean("checkUpdates")==true || Configuration.config.getBoolean("autoUpdate")==true)
 		{
 			this.getServer().getScheduler()
 			.runTaskLaterAsynchronously(this, new Runnable() {
@@ -140,7 +143,7 @@ public class cmdBook extends JavaPlugin {
 			}, 0L);	
 		}else{
 			this.logger.warning(cmdFormat + "Automatic updates is turned off!");
-		}
+		}*/
 	}
 
 	@Override

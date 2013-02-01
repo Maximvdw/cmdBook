@@ -192,7 +192,7 @@ public class Book {
 				if (pageContent[0].toString().toLowerCase()
 						.startsWith("[cmdbook]")) {
 					// Check if player has enough money
-					if (Configuration.config.getBoolean("economy.enabled") == false) {
+					if (Configuration.config.getBoolean("economy.enabled") == false || plugin.economyFound == false || plugin.economyFound == false) {
 						// No economy enabled
 						// Commandbook Created :)
 						this.logger.info(cmdFormat + player.getName()
@@ -283,7 +283,7 @@ public class Book {
 					if (player.hasPermission("cmdbook.edit")) {
 						// Player has permisions
 						// Unsign the book
-						if (Configuration.config.getBoolean("economy.enabled") == false) {
+						if (Configuration.config.getBoolean("economy.enabled") == false || plugin.economyFound == false || plugin.economyFound == false) {
 							// No economy enabled
 						} else {
 							if (plugin.econ.getBalance(player.getName()) >= Configuration.config
@@ -653,7 +653,7 @@ public class Book {
 			{
 				// Economy
 				try {
-					if (Configuration.config.getBoolean("economy.enabled") == false) {
+					if (Configuration.config.getBoolean("economy.enabled") == false || plugin.economyFound == false || plugin.economyFound == false || plugin.economyFound == false) {
 						// No economy enabled
 					} else {
 						if (plugin.econ.getBalance(player.getName()) >= economy_price_use) {

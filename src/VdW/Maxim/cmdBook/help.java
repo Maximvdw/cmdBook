@@ -80,6 +80,9 @@ public class help extends JavaPlugin {
 			+ "&e$broadcast[...] &f- Broadcast a message to all players\n"
 			+ "&e$chat[...] &f- Send a chat message as the player\n"
 			+ "&e@runconsole &f- Run all commands as console\n"
+			+ "&e@pay[...] &f- Override default usage cost\n"
+			+ "&e@uses[...] &f- Decreases to 0, unable to use when 0\n"
+			+ "&e@destroywhenused &f- Delete book when uses=0\n"
 			+ "&e@hidemessages &f- Hide all cmdBook messages";
 
 	public void cmdbook_help(Player player) {

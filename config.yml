@@ -29,13 +29,6 @@ economy:
 ### -------------------- ####
 
 
-### ----- UPDATING ----- ####
-# Check for updates. This will not update cmdBook 
-# This will use dev.bukkit.org to check for cmdBook updates
-checkUpdates: true
-### -------------------- ####
-
-
 # DO NOT EDIT THIS LINE
 # DOING SO WILL BREAK cmdBook!
 config: 5
