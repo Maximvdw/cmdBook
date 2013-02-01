@@ -61,8 +61,7 @@ public class updater {
 			String line = null;
 			String regExp = "<a href=\"(/server-mods/" + devName + "/files/"
 					+ "(0|(\\+)?([1-9]{1}[0-9]{0,1}|[1]{1}[0-9]{0,2}|[2]{1}([0-4]"
-					+ "{1}[0-9]{1}|[5]{1}[0-5]{1})))-" + devFileSplit + "-[0-9]-[0-9]-[0-9]"
-					+ "/)\\\">" + devName + " [0-9].[0-9].[0-9]</a> for CB " + craftbookV;
+					+ "{1}[0-9]{1}|[5]{1}[0-5]{1})))-" + devFileSplit + "-";
 			Pattern p = Pattern.compile(regExp, Pattern.CASE_INSENSITIVE);
 			while ((line = reader.readLine()) != null) {
 				Matcher m = p.matcher(line);
@@ -73,7 +72,7 @@ public class updater {
 								+ "The plugin is outdated!");
 						updateAvailable = true;
 						// Get url
-						String url_downloadPage = "http://dev.bukkit.org/"
+						/*String url_downloadPage = "http://dev.bukkit.org/"
 								+ m.group(1).toString();
 
 						url = new URL(url_downloadPage);
@@ -96,7 +95,7 @@ public class updater {
 										/*
 										 * Get a connection to the URL and start
 										 * up a buffered reader.
-										 */
+										 *
 										long startTime = System
 												.currentTimeMillis();
 										File theDir = new File(
@@ -121,7 +120,7 @@ public class updater {
 										/*
 										 * Setup a buffered file writer to write
 										 * out what we read from the website.
-										 */
+										 *
 										FileOutputStream writer = new FileOutputStream(
 												System.getProperty("user.dir")
 														+ "/plugins/update/cmdBook.jar");
@@ -165,7 +164,7 @@ public class updater {
 								reader.close();
 								break;
 							}
-						}
+						}*/
 						break;
 					} else {
 						this.logger

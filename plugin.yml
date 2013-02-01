@@ -113,6 +113,19 @@ permissions:
     cmdbook.info:
         description: Allows a user to see the commands inside a book
         default: op
+    cmdbook.variable.pay:
+        description: Allows a player to add the @pay
+        default: true
+    cmdbook.variable.uses:
+        description: Allows a player to add the @uses
+        default: true
+        children:
+            cmdbook.use.uses: true
+    cmdbook.variable.destroywhenused:
+        description: Allows a player to add the @destroywhenused
+        default: true
+        children:
+            cmdbook.use.destroywhenused: true
     cmdbook.variable.script:
         description: Allows a player to add the script[] in a book
         default: true

@@ -52,6 +52,7 @@ public class Book {
 	static String error_money = "&2[&fcmdBook&2] &cYou do not have {MONEY}$!";
 	static String error_alreadycmd = "&cThis is already a cmdBook!";
 	static String error_effect = "&cThe effect {EFFECT} is not valid. Use BLAZE_SHOOT BOW_FIRE CLICK1 CLICK2 DOOR_TOGGLE ENDER_SIGNAL EXTINGUISH GHAST_SHOOT GHAST_SHRIEK MOBSPAWNER_FLAMES POTION_BREAK RECORD_PLAY SMOKE STEP_SOUND ZOMBIE_CHEW_IRON_DOOR ZOMBIE_CHEW_WOODEN_DOOR ZOMBIE_DESTROY_DOOR";
+	static String error_uses = "&cYou cannot use this book anymore!";
 	// Confirm messages (Handy for other languages)
 	static String confirm_bookcreated = "&aYour cmdBook has been created!";
 	static String confirm_unsigned = "&aYour cmdBook has been unsigned!";
@@ -125,6 +126,10 @@ public class Book {
 				bookContent = bookContent.replace(plugin.splitCmd
 						+ plugin.splitCmd, "#TOKEN#");
 
+				if (bookContent.toLowerCase().contains("@destroywhenused")) {
+					bookContent = bookContent.replace("@destroywhenused", "");
+					commandList += "&4Book will be destroyed when uses=0!\n";
+				}
 				if (bookContent.toLowerCase().contains("@runconsole")) {
 					bookContent = bookContent.replace("@runconsole", "");
 					commandList += "&4Commands will be run as console\n";
@@ -355,6 +360,7 @@ public class Book {
 		String seperator = plugin.splitCmd;
 		String bookContent = "";
 		boolean runConsole = false;
+		boolean destroywhenused = false;
 		boolean hideMessages = false;
 		int cmd_counter = 0;
 		int counter = 0;
@@ -372,6 +378,15 @@ public class Book {
 					}
 				}
 				bookContent = bookContent.replace("@runconsole", "");
+			} catch (Exception ex) {
+			}
+			try {
+				if (player.hasPermission("cmdbook.use.destroywhenused")) {
+					if (bookContent.toLowerCase().contains("@destroywhenused")) {
+						destroywhenused = true;
+					}
+				}
+				bookContent = bookContent.replace("@destroywhenused", "");
 			} catch (Exception ex) {
 			}
 			try {
@@ -584,156 +599,207 @@ public class Book {
 			} catch (Exception ex) {
 			}
 
-			// Economy
-			try {
-				if (Configuration.config.getBoolean("economy.enabled") == false) {
-					// No economy enabled
-				} else {
-					if (plugin.econ.getBalance(player.getName()) >= Configuration.config
-							.getInt("economy.use_price")) {
-						plugin.econ.withdrawPlayer(player.getName(),
-								Configuration.config
-										.getInt("economy.use_price"));
-						// Send message to player
-						player.sendMessage(chatColor.stringtodata(confirm_money
-								.replaceAll("\\{MONEY\\}", Configuration.config
-										.getString("economy.use_price"))));
+			// Default Economy
+			int economy_price_use = Configuration.config
+					.getInt("economy.use_price");
+			// Now check for price[] in book
+			Pattern regex = Pattern
+					.compile("\\@price\\[(.*?)\\]");
+			Matcher regexMatcher = regex.matcher(bookContent);
+			while (regexMatcher.find()) {
+				try {
+					// matched text: regexMatcher.group(i)
+					// match start: regexMatcher.start(i)
+					// match end: regexMatcher.end(i)
+					plugin.logger.info(cmdFormat + "Price book loaded: " + regexMatcher.group(0).replace("@price[", "").replace("]", ""));
+					economy_price_use = Integer.parseInt(regexMatcher.group(0).replace("@price[", "").replace("]", ""));
+					bookContent = bookContent.replace(regexMatcher.group(0), "");
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+			// Now check for uses[] in book
+			int uses = -1;
+			regex = Pattern
+					.compile("\\@uses\\[(.*?)\\]");
+			regexMatcher = regex.matcher(bookContent);
+			while (regexMatcher.find()) {
+				try {
+					// matched text: regexMatcher.group(i)
+					// match start: regexMatcher.start(i)
+					// match end: regexMatcher.end(i)
+					plugin.logger.info(cmdFormat + "Loaded uses of book: " + regexMatcher.group(0).replace("@uses[", "").replace("]", ""));
+					uses = Integer.parseInt(regexMatcher.group(0).replace("@uses[", "").replace("]", ""));
+					bookContent = bookContent.replace(regexMatcher.group(0), "");
+				    BookMeta book = (BookMeta)item.getItemMeta();
+				    if (uses != 0)
+				    {
+					    int nextuse = Integer.parseInt(regexMatcher.group(0).replace("@uses[", "").replace("]", "")) -1;
+					    book.setPage(1, book.getPage(1).replace(regexMatcher.group(0), "@uses[" + nextuse + "]"));
+					    item.setItemMeta(book);
+				    }else{
+				    	if (destroywhenused == true)
+				    	{
+				    		item = null;
+				    		player.setItemInHand(null);
+				    	}
+				    }
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+			
+			if (uses >0 || uses == -1)
+			{
+				// Economy
+				try {
+					if (Configuration.config.getBoolean("economy.enabled") == false) {
+						// No economy enabled
 					} else {
-						// No money
-						player.sendMessage(chatColor.stringtodata(error_money
-								.replaceAll("\\{MONEY\\}", Configuration.config
-										.getString("economy.use_price"))));
-						return;
-					}
-				}
-			} catch (Exception ex) {
-				// Error
-			}
-
-			// Check if bookcontent includes a || in a command
-			bookContent = bookContent.replace(
-					plugin.splitCmd + plugin.splitCmd, "#TOKEN#");
-
-			// Do a quick check to see how many commands need to be stored
-			for (int j = 1; j < bookContent.length() + 1; j++) {
-				if (bookContent.charAt(j - 1) == seperator.toCharArray()[0]
-						|| bookContent.length() == j) {
-					cmd_counter += 1;
-				}
-			}
-			plugin.logger.info(cmdFormat + "Found " + cmd_counter
-					+ " commands in " + player.getName() + "'s cmdBook");
-
-			String[] tmpArray = new String[cmd_list.length];
-			for (int j = 0; j < cmd_list.length; j++) {
-				tmpArray[j] = cmd_list[j];
-			}
-			cmd_list = new String[cmd_counter + 1];
-			for (int j = 0; j < tmpArray.length; j++) {
-				cmd_list[j] = tmpArray[j];
-			}
-
-			// Now read every letter and search for |
-			for (int j = 1; j < bookContent.length() + 1; j++) {
-				if (bookContent.charAt(j - 1) == seperator.toCharArray()[0]
-						|| bookContent.length() == j) {
-					// Execute command
-					try {
-						// Check for calculations
-						String command = bookContent.substring((j - count), j)
-								.replace(plugin.splitCmd, "");
-						command = command.replace("#TOKEN#", plugin.splitCmd);
-						cmd_list[counter] = command;
-						counter += 1;
-					} catch (Exception e) {
-						// Error
-					}
-					count = 0;
-				}
-
-				// Check for @input
-				if (bookContent.charAt(j - 1) == '@') {
-					// Check if it is an input
-					if (bookContent.substring(j - 1, j + 5).equalsIgnoreCase(
-							"@input")) {
-						// It is an input
-						String questionUser = "";
-						String inputStr_Replace = "@input";
-						if (bookContent.charAt(j + 5) == '[') {
-							try {
-								questionUser = bookContent.substring(j + 6,
-										bookContent.indexOf("]", j + 7));
-								inputStr_Replace = "@input[" + questionUser
-										+ "]";
-							} catch (Exception ex) {
-								// Error
-							}
+						if (plugin.econ.getBalance(player.getName()) >= economy_price_use) {
+							plugin.econ.withdrawPlayer(player.getName(),
+									economy_price_use);
+							// Send message to player
+							player.sendMessage(chatColor.stringtodata(confirm_money
+									.replaceAll("\\{MONEY\\}", economy_price_use + "")));
+						} else {
+							// No money
+							player.sendMessage(chatColor.stringtodata(error_money
+									.replaceAll("\\{MONEY\\}", economy_price_use + "")));
+							return;
 						}
-						ConversationFactory factory;
+					}
+				} catch (Exception ex) {
+					// Error
+				}
 
-						// Constructor or whatever init method
-						factory = new ConversationFactory(plugin);
+				// Check if bookcontent includes a || in a command
+				bookContent = bookContent.replace(
+						plugin.splitCmd + plugin.splitCmd, "#TOKEN#");
 
-						// Where plugin = your JavaPlugin class instance
-						if (player instanceof Player) {
-							final Map<Object, Object> map = new HashMap<Object, Object>();
-							map.put("data",
-									chatColor.stringtodata(variable_inputquestion
-											+ chatColor
-													.stringtodata(questionUser)));
-							Conversation conv = factory
-									.withFirstPrompt(new inputPlayer() {
-									}).withInitialSessionData(map)
-									.withLocalEcho(false)
-									.buildConversation((Player) player);
-							conv.addConversationAbandonedListener(new ConversationAbandonedListener() {
+				// Do a quick check to see how many commands need to be stored
+				for (int j = 1; j < bookContent.length() + 1; j++) {
+					if (bookContent.charAt(j - 1) == seperator.toCharArray()[0]
+							|| bookContent.length() == j) {
+						cmd_counter += 1;
+					}
+				}
+				plugin.logger.info(cmdFormat + "Found " + cmd_counter
+						+ " commands in " + player.getName() + "'s cmdBook");
 
-								@Override
-								public void conversationAbandoned(
-										ConversationAbandonedEvent event) {
-									answer = ""
-											+ event.getContext()
-													.getSessionData("data");
-								}
-							});
-							conv.begin();
+				String[] tmpArray = new String[cmd_list.length];
+				for (int j = 0; j < cmd_list.length; j++) {
+					tmpArray[j] = cmd_list[j];
+				}
+				cmd_list = new String[cmd_counter + 1];
+				for (int j = 0; j < tmpArray.length; j++) {
+					cmd_list[j] = tmpArray[j];
+				}
 
-							while (answer == "") {
+				// Now read every letter and search for |
+				for (int j = 1; j < bookContent.length() + 1; j++) {
+					if (bookContent.charAt(j - 1) == seperator.toCharArray()[0]
+							|| bookContent.length() == j) {
+						// Execute command
+						try {
+							// Check for calculations
+							String command = bookContent.substring((j - count), j)
+									.replace(plugin.splitCmd, "");
+							command = command.replace("#TOKEN#", plugin.splitCmd);
+							cmd_list[counter] = command;
+							counter += 1;
+						} catch (Exception e) {
+							// Error
+						}
+						count = 0;
+					}
+
+					// Check for @input
+					if (bookContent.charAt(j - 1) == '@') {
+						// Check if it is an input
+						if (bookContent.substring(j - 1, j + 5).equalsIgnoreCase(
+								"@input")) {
+							// It is an input
+							String questionUser = "";
+							String inputStr_Replace = "@input";
+							if (bookContent.charAt(j + 5) == '[') {
 								try {
-									Thread.currentThread().sleep(10);
-								} catch (InterruptedException e) {
+									questionUser = bookContent.substring(j + 6,
+											bookContent.indexOf("]", j + 7));
+									inputStr_Replace = "@input[" + questionUser
+											+ "]";
+								} catch (Exception ex) {
+									// Error
 								}
 							}
+							ConversationFactory factory;
 
-							if (answer == "/abort") {
-								// Abort
-								answer = "";
-								break;
-							}
+							// Constructor or whatever init method
+							factory = new ConversationFactory(plugin);
 
-							// Replace input
-							try {
-								plugin.logger.info(cmdFormat + player.getName()
-										+ " input : " + answer);
-								bookContent = bookContent.substring(0, j - 1)
-										+ answer
-										+ bookContent
-												.substring(j
-														+ inputStr_Replace
-																.length() - 1);
-								answer = ""; // Reset
-							} catch (Exception ex) {
-								// Error
-								plugin.logger.severe(cmdFormat
-										+ "Unable to replace the input!");
-								player.sendMessage(chatColor
-										.stringtodata(error_broken));
-								return;
+							// Where plugin = your JavaPlugin class instance
+							if (player instanceof Player) {
+								final Map<Object, Object> map = new HashMap<Object, Object>();
+								map.put("data",
+										chatColor.stringtodata(variable_inputquestion
+												+ chatColor
+														.stringtodata(questionUser)));
+								Conversation conv = factory
+										.withFirstPrompt(new inputPlayer() {
+										}).withInitialSessionData(map)
+										.withLocalEcho(false)
+										.buildConversation((Player) player);
+								conv.addConversationAbandonedListener(new ConversationAbandonedListener() {
+
+									@Override
+									public void conversationAbandoned(
+											ConversationAbandonedEvent event) {
+										answer = ""
+												+ event.getContext()
+														.getSessionData("data");
+									}
+								});
+								conv.begin();
+
+								while (answer == "") {
+									try {
+										Thread.currentThread().sleep(10);
+									} catch (InterruptedException e) {
+									}
+								}
+
+								if (answer == "/abort") {
+									// Abort
+									answer = "";
+									break;
+								}
+
+								// Replace input
+								try {
+									plugin.logger.info(cmdFormat + player.getName()
+											+ " input : " + answer);
+									bookContent = bookContent.substring(0, j - 1)
+											+ answer
+											+ bookContent
+													.substring(j
+															+ inputStr_Replace
+																	.length() - 1);
+									answer = ""; // Reset
+								} catch (Exception ex) {
+									// Error
+									plugin.logger.severe(cmdFormat
+											+ "Unable to replace the input!");
+									player.sendMessage(chatColor
+											.stringtodata(error_broken));
+									return;
+								}
 							}
 						}
 					}
+					count += 1; // Add int
 				}
-				count += 1; // Add int
+			}else{
+				
 			}
 		}
 
@@ -1015,6 +1081,9 @@ public class Book {
 											+ player.getName()
 											+ " performed chat " + command);
 								}
+							}else
+							{
+								
 							}
 						}
 					} catch (Exception e) {

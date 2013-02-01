@@ -18,6 +18,8 @@ import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
+
+import VdW.Maxim.cmdBook.Metrics.Metrics;
 import VdW.Maxim.cmdBook.Metrics.IncrementalPlotter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,7 +28,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import VdW.Maxim.cmdBook.Metrics.Metrics;
 import VdW.Maxim.cmdBook.Updater.updater;
 
 public class PlayerListener implements Listener {

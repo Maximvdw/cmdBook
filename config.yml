@@ -3,7 +3,6 @@
 # Copyright: 2012-2013
 # -----------------------------
 
-
 # Allow users to perform chat in a book
 # This does not include the $chat[..] variable
 allow_chat: true
@@ -34,12 +33,6 @@ economy:
 # Check for updates. This will not update cmdBook 
 # This will use dev.bukkit.org to check for cmdBook updates
 checkUpdates: true
-
-# Automatically update the plugin when its outdated
-# This will download the last craftbook compatible plugin
-autoUpdate: false
-# NOTE: This might break cmdBook when using an older craftbukkit
-# DO NOT USE THIS !!!!!!!!!! IT IS BUGGED
 ### -------------------- ####
 
 
