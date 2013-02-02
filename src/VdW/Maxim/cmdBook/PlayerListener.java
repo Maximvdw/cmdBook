@@ -55,7 +55,7 @@ public class PlayerListener implements Listener {
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		// Check if it is an admin
-		if (event.getPlayer().hasPermission("cmdbook.update")) {
+		/*if (event.getPlayer().hasPermission("cmdbook.update")) {
 			if (updater.updateAvailable == true) {
 				if (updater.updated == true) {
 					event.getPlayer().sendMessage(
@@ -65,7 +65,7 @@ public class PlayerListener implements Listener {
 							chatColor.stringtodata(warning_update_available));
 				}
 			}
-		}
+		}*/
 	}
 
 	@EventHandler
