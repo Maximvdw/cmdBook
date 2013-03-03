@@ -1,6 +1,6 @@
 name: cmdBook
 main: VdW.Maxim.cmdBook.cmdBook
-version: 1.3.6
+version: 1.3.9
 website: http://dev.bukkit.org/server-mods/cmdBook/
 author: Maximvdw
 description: Execute multiple commands in a book
@@ -113,9 +113,24 @@ permissions:
     cmdbook.info:
         description: Allows a user to see the commands inside a book
         default: op
+    cmdbook.use.pay:
+        description: Allows you to use a book with @pay
+        default: true
+    cmdbook.use.uses:
+        description: Allows you to use a book with @uses
+        default: true
+    cmdbook.use.destroywhenused:
+        description: Allows you to use a book with @destroywhenused
+        default: true
+    cmdbook.use.calculation:
+        description: Allows you to use a book with a calculation
+        default: true
+    cmdbook.use.script:
+        description: Allows you to use a book with a script
+        default: true
     cmdbook.variable.pay:
         description: Allows a player to add the @pay
-        default: true
+        default: op
     cmdbook.variable.uses:
         description: Allows a player to add the @uses
         default: true
@@ -128,7 +143,7 @@ permissions:
             cmdbook.use.destroywhenused: true
     cmdbook.variable.script:
         description: Allows a player to add the script[] in a book
-        default: true
+        default: op
         children:
             cmdbook.use.script: true
     cmdbook.variable.calculation:

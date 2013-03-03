@@ -82,19 +82,197 @@ public class PlayerListener implements Listener {
 			try {
 				switch (action) {
 				case LEFT_CLICK_BLOCK:
+					if (action_block.getType() == Material.STONE_BUTTON || action_block.getType() == Material.WOOD_BUTTON)
+					{
+						int x = action_block.getX();
+						int y = action_block.getY();
+						int z = action_block.getZ();
+						// Now check if there is a chest below it
+						for (int xrad= -plugin.chestRadius;xrad<=plugin.chestRadius;xrad++)
+						{
+							for (int yrad = -plugin.chestRadius;yrad<=plugin.chestRadius;yrad++)
+							{
+								for (int zrad = -plugin.chestRadius;zrad<=plugin.chestRadius;zrad++)
+								{
+									Location chest_location = new Location(player.getWorld(),
+											x-xrad, y-yrad, z-zrad);
+									Block chest = chest_location.getBlock();
+									// Check if it is indeed a chest
+									if (chest.getType() == Material.CHEST) {
+										// Continue searching the chest
+										Chest chest_block = (Chest) chest.getState();
+										Inventory chest_inv = chest_block.getInventory();
+										for (final ItemStack item : chest_inv.getContents()) {
+											// Check if item is a book
+											if (item != null) {
+												if (item.getTypeId() == 387) {
+													// Check if it is a cmdbook
+													// Player is holding a book
+													// Now check if it is a cmdBook
+													Book check = new Book(plugin);
+													Object pageContent[] = check.getBookContent(player,item);
+													BookMeta book = (BookMeta) item.getItemMeta();
+
+													// Now read author
+													String authorPlugin = (ChatColor.RED + "cmdBook")
+															.toString(); // The
+																			// cmdBook
+													// author
+													if (pageContent[0].toString().toLowerCase()
+															.startsWith("[cmdbook]")
+															& book.getAuthor().equalsIgnoreCase(
+																	authorPlugin)) {
+														// It is a cmdBook
+														// Now check if the player has permission
+														// to execute that
+														if (player.hasPermission("cmdbook.use")) {
+															// Player has permisions
+															plugin.getServer()
+																	.getScheduler()
+																	.runTaskLaterAsynchronously(plugin,
+																			new Runnable() {
+																				public void run() {
+																					Book execute = new Book(
+																							plugin);
+																					execute.performCommands(player,item);
+
+																					// Add Metrics Graph
+																					try {
+																						Metrics metrics = new Metrics(
+																								plugin);
+
+																						// Plot the total
+																						// amount of
+																						// protections
+																						ip.increment();
+
+																						metrics.addCustomData(ip);
+																						metrics.start();
+
+																					} catch (IOException e) {
+																						// Error
+																					}
+																					// -------------------
+
+																				}
+																			}, 0L);
+														} else {
+															// No permission
+															player.closeInventory();
+															player.sendMessage(chatColor
+																	.stringtodata(error_permission));
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
 					break;
 				case RIGHT_CLICK_BLOCK:
+					if (action_block.getType() == Material.STONE_BUTTON || action_block.getType() == Material.WOOD_BUTTON)
+					{
+						int x = action_block.getX();
+						int y = action_block.getY();
+						int z = action_block.getZ();
+						// Now check if there is a chest below it
+						for (int xrad= -plugin.chestRadius;xrad<=plugin.chestRadius;xrad++)
+						{
+							for (int yrad = -plugin.chestRadius;yrad<=plugin.chestRadius;yrad++)
+							{
+								for (int zrad = -plugin.chestRadius;zrad<=plugin.chestRadius;zrad++)
+								{
+									Location chest_location = new Location(player.getWorld(),
+											x-xrad, y-yrad, z-zrad);
+									Block chest = chest_location.getBlock();
+									// Check if it is indeed a chest
+									if (chest.getType() == Material.CHEST) {
+										// Continue searching the chest
+										Chest chest_block = (Chest) chest.getState();
+										Inventory chest_inv = chest_block.getInventory();
+										for (final ItemStack item : chest_inv.getContents()) {
+											// Check if item is a book
+											if (item != null) {
+												if (item.getTypeId() == 387) {
+													// Check if it is a cmdbook
+													// Player is holding a book
+													// Now check if it is a cmdBook
+													Book check = new Book(plugin);
+													Object pageContent[] = check.getBookContent(player,item);
+													BookMeta book = (BookMeta) item.getItemMeta();
+
+													// Now read author
+													String authorPlugin = (ChatColor.RED + "cmdBook")
+															.toString(); // The
+																			// cmdBook
+													// author
+													if (pageContent[0].toString().toLowerCase()
+															.startsWith("[cmdbook]")
+															& book.getAuthor().equalsIgnoreCase(
+																	authorPlugin)) {
+														// It is a cmdBook
+														// Now check if the player has permission
+														// to execute that
+														if (player.hasPermission("cmdbook.use")) {
+															// Player has permisions
+															plugin.getServer()
+																	.getScheduler()
+																	.runTaskLaterAsynchronously(plugin,
+																			new Runnable() {
+																				public void run() {
+																					Book execute = new Book(
+																							plugin);
+																					execute.performCommands(player,item);
+
+																					// Add Metrics Graph
+																					try {
+																						Metrics metrics = new Metrics(
+																								plugin);
+
+																						// Plot the total
+																						// amount of
+																						// protections
+																						ip.increment();
+
+																						metrics.addCustomData(ip);
+																						metrics.start();
+
+																					} catch (IOException e) {
+																						// Error
+																					}
+																					// -------------------
+
+																				}
+																			}, 0L);
+														} else {
+															// No permission
+															player.closeInventory();
+															player.sendMessage(chatColor
+																	.stringtodata(error_permission));
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
 					break;
 				case PHYSICAL:
 					int x = action_block.getX();
 					int y = action_block.getY();
 					int z = action_block.getZ();
 					// Now check if there is a chest below it
-					for (int xrad= -3;xrad<4;xrad++)
+					for (int xrad= -plugin.chestRadius;xrad<=plugin.chestRadius;xrad++)
 					{
-						for (int yrad = -3;yrad<4;yrad++)
+						for (int yrad = -plugin.chestRadius;yrad<=plugin.chestRadius;yrad++)
 						{
-							for (int zrad = -3;zrad<4;zrad++)
+							for (int zrad = -plugin.chestRadius;zrad<=plugin.chestRadius;zrad++)
 							{
 								Location chest_location = new Location(player.getWorld(),
 										x-xrad, y-yrad, z-zrad);

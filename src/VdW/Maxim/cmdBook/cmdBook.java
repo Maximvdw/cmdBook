@@ -29,12 +29,13 @@ public class cmdBook extends JavaPlugin {
 	public cmdBook plugin = this; // Plugin will now refer to cmdBook
 	private CommandClass CommandListener; // Wait for commands in a different
 											// class
-	public static int config_version = 4; // Configuration version
+	public static int config_version = 6; // Configuration version
 	public static int cb_buildversion = 147; // The craftbukkit version, this app was build for
 	public String splitCmd = "|"; // The default split command char
 	public boolean allowChat = true; // Allow chat to be executed in cmdBooks
 	public final PlayerListener pl = new PlayerListener(this);
 	public boolean economyFound = false;
+	public int chestRadius = 3;
 
 	// Vault variables
     public Economy econ = null;
@@ -120,6 +121,7 @@ public class cmdBook extends JavaPlugin {
 				configClass.update();
 			}
 			this.splitCmd = Configuration.config.getString("cmd_split"); // Get split character
+			this.chestRadius =  Configuration.config.getInt("chestRadius"); // Get chest Radius
 			this.logger.info(cmdFormat + "Using split character '" + splitCmd + "'");
 			if (splitCmd == "")
 			{
