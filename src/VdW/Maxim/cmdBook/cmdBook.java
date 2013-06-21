@@ -1,9 +1,9 @@
 package VdW.Maxim.cmdBook;
 
 /* Name:		cmdBook
- * Version: 	1.1.1
+ * Version: 	1.4.0
  * Made by: 	Maxim Van de Wynckel
- * Build date:	2/09/2012						
+ * Build date:	21/08/2013						
  */
 
 import java.io.File;
@@ -30,7 +30,7 @@ public class cmdBook extends JavaPlugin {
 	private CommandClass CommandListener; // Wait for commands in a different
 											// class
 	public static int config_version = 6; // Configuration version
-	public static int cb_buildversion = 147; // The craftbukkit version, this app was build for
+	public static int cb_buildversion = 152; // The craftbukkit version, this app was build for
 	public String splitCmd = "|"; // The default split command char
 	public boolean allowChat = true; // Allow chat to be executed in cmdBooks
 	public final PlayerListener pl = new PlayerListener(this);

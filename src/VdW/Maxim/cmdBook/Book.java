@@ -19,10 +19,12 @@ import org.bukkit.conversations.Conversation;
 import org.bukkit.conversations.ConversationAbandonedEvent;
 import org.bukkit.conversations.ConversationAbandonedListener;
 import org.bukkit.conversations.ConversationFactory;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.plugin.PluginDescriptionFile;
 
 import VdW.Maxim.cmdBook.cmdBook;
@@ -81,8 +83,8 @@ public class Book {
 		// be unsigned, so it can be used for editing again
 		// Get the item
 		ItemStack is = item;
-		BookMeta book = (BookMeta) is.getItemMeta();
 		if (is.getTypeId() == 387) {
+			BookMeta book = (BookMeta) is.getItemMeta();
 			// check if the valid yet
 			String authorPlugin = (ChatColor.RED + "cmdBook").toString();
 			Object[] pageContent = getBookContent(player, item);
@@ -260,10 +262,10 @@ public class Book {
 
 		// Get the item the player has in his hand
 		ItemStack is = item;
-		BookMeta book = (BookMeta) is.getItemMeta();
 
 		// Check if the player is holding a book
 		if (is.getTypeId() == 387) {
+			BookMeta book = (BookMeta) is.getItemMeta();
 			// Player is holding a book
 			// Now check if it is a cmdBook
 			Object pageContent[] = getBookContent(player, item);
@@ -672,6 +674,8 @@ public class Book {
 				} catch (Exception ex) {
 					// Error
 				}
+				
+				
 
 				// Check if bookcontent includes a || in a command
 				bookContent = bookContent.replace(
@@ -1017,6 +1021,14 @@ public class Book {
 										.stringtodata(message));
 								this.logger.info(cmdFormat + player.getName()
 										+ " message send: " + message);
+							}
+						} else if (command.toLowerCase().startsWith("$workbench")) {
+							if (player.hasPermission("cmdbook.use.workbench")) {
+								player.openWorkbench(player.getLocation(), true);
+							}
+						} else if (command.toLowerCase().startsWith("$enchtable")) {
+							if (player.hasPermission("cmdbook.use.enchtable")) {
+								player.openEnchanting(player.getLocation(), true);
 							}
 						} else if (command.toLowerCase().startsWith("$chat[")) {
 							// Chat perform

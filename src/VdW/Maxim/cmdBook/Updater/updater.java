@@ -1,12 +1,8 @@
 package VdW.Maxim.cmdBook.Updater;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -15,13 +11,12 @@ import java.util.regex.Pattern;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginDescriptionFile;
 
-import VdW.Maxim.cmdBook.Configuration;
 import VdW.Maxim.cmdBook.cmdBook;
 
 /* Name:		cmdBook
- * Version: 	1.3.3
+ * Version: 	1.4.0
  * Made by: 	Maxim Van de Wynckel
- * Build date:	27/01/2013						
+ * Build date:	21/06/2013						
  */
 
 public class updater {
@@ -61,7 +56,7 @@ public class updater {
 			String line = null;
 			String regExp = "<a href=\"(/server-mods/" + devName + "/files/"
 					+ "(0|(\\+)?([1-9]{1}[0-9]{0,1}|[1]{1}[0-9]{0,2}|[2]{1}([0-4]"
-					+ "{1}[0-9]{1}|[5]{1}[0-5]{1})))-" + devFileSplit + "-";
+					+ "{1}[0-9]{1}|[5]{1}[0-5]{1}))))-" + devFileSplit + "-";
 			Pattern p = Pattern.compile(regExp, Pattern.CASE_INSENSITIVE);
 			while ((line = reader.readLine()) != null) {
 				Matcher m = p.matcher(line);
@@ -179,6 +174,7 @@ public class updater {
 		} catch (Exception ex) {
 			this.logger
 			.warning(cmdFormat + "Unable to check for updates!");
+			ex.printStackTrace();
 		}
 	}
 }
