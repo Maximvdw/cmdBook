@@ -1,6 +1,6 @@
 name: cmdBook
 main: VdW.Maxim.cmdBook.cmdBook
-version: 1.4.0
+version: 1.4.1
 website: http://dev.bukkit.org/server-mods/cmdBook/
 author: Maximvdw
 description: Execute multiple commands in a book

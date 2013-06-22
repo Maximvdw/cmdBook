@@ -30,6 +30,8 @@ economy:
     use_price: 0
 ### -------------------- ####
 
+## Check for updates
+checkUpdates: true
 
 # DO NOT EDIT THIS LINE
 # DOING SO WILL BREAK cmdBook!

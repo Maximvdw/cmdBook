@@ -1,5 +1,8 @@
 package VdW.Maxim.cmdBook;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +58,8 @@ public class Book {
 	static String error_alreadycmd = "&cThis is already a cmdBook!";
 	static String error_effect = "&cThe effect {EFFECT} is not valid. Use BLAZE_SHOOT BOW_FIRE CLICK1 CLICK2 DOOR_TOGGLE ENDER_SIGNAL EXTINGUISH GHAST_SHOOT GHAST_SHRIEK MOBSPAWNER_FLAMES POTION_BREAK RECORD_PLAY SMOKE STEP_SOUND ZOMBIE_CHEW_IRON_DOOR ZOMBIE_CHEW_WOODEN_DOOR ZOMBIE_DESTROY_DOOR";
 	static String error_uses = "&cYou cannot use this book anymore!";
+	static String error_wait = "&cPlease wait until {TIME} before using this book again!";
+	static String error_normalbook = "&ccmdBook is amazed by the complexity of this book, but it is not a cmdBook...";
 	// Confirm messages (Handy for other languages)
 	static String confirm_bookcreated = "&aYour cmdBook has been created!";
 	static String confirm_unsigned = "&aYour cmdBook has been unsigned!";
@@ -72,7 +77,6 @@ public class Book {
 	public void infocmdBook(Player player, ItemStack item) {
 		// PUT THIS INTO EVERY METHOD
 		PluginDescriptionFile pdfFile = plugin.getDescription();
-		@SuppressWarnings("unused")
 		String cmdFormat = "[" + pdfFile.getName() + "] ";
 		// --------------------------
 
@@ -86,82 +90,221 @@ public class Book {
 		if (is.getTypeId() == 387) {
 			BookMeta book = (BookMeta) is.getItemMeta();
 			// check if the valid yet
-			String authorPlugin = (ChatColor.RED + "cmdBook").toString();
 			Object[] pageContent = getBookContent(player, item);
-			if (pageContent[0].toString().toLowerCase().startsWith("[cmdbook]")
-					& book.getAuthor().equalsIgnoreCase(authorPlugin)) {
-
-			}
 			// Get contents
 			Object pageContents[] = getBookContent(player, item);
 			// Remove the [cmdbook]
-			pageContents[0] = pageContents[0].toString().substring(
-					"[cmdbook]".length());
-			// Now read every page an execute the commands
-			int count = 1;
-			String seperator = plugin.splitCmd;
-			String bookContent = "";
-			for (int i = 0; i < pageContents.length; i++) {
-				ScriptEngineManager mgr = new ScriptEngineManager();
-				ScriptEngine engine = mgr.getEngineByName("javascript");
-				Pattern regex = Pattern.compile("calc\\((.*?)\\)");
-				Matcher regexMatcher = regex.matcher(pageContent[i].toString());
-				while (regexMatcher.find()) {
-					for (int x = 1; x <= regexMatcher.groupCount(); x++) {
+			if (pageContents[0].toString().startsWith("[cmdbook]")) {
+				pageContents[0] = pageContents[0].toString().substring(
+						"[cmdbook]".length());
+				// Now read every page an execute the commands
+				int count = 1;
+				String seperator = plugin.splitCmd;
+				String bookContent = "";
+				for (int i = 0; i < pageContents.length; i++) {
+					ScriptEngineManager mgr = new ScriptEngineManager();
+					ScriptEngine engine = mgr.getEngineByName("javascript");
+					Pattern regex = Pattern.compile("calc\\((.*?)\\)");
+					Matcher regexMatcher = regex.matcher(pageContent[i]
+							.toString());
+					while (regexMatcher.find()) {
+						for (int x = 1; x <= regexMatcher.groupCount(); x++) {
+							try {
+								// matched text: regexMatcher.group(i)
+								// match start: regexMatcher.start(i)
+								// match end: regexMatcher.end(i)
+								engine.getBindings(ScriptContext.ENGINE_SCOPE);
+								commandList += "&4'calc("
+										+ regexMatcher.group(x).toString()
+										+ ")' is deprecated!\nUse /cb convert to fix this issue\n";
+							} catch (Exception ex) {
+								ex.printStackTrace();
+							}
+						}
+					}
+
+					// Make one string of all those pages
+					bookContent = pageContents[i].toString().replace("\n", "");
+					// Check if bookcontent includes a || in a command
+					bookContent = bookContent.replace(plugin.splitCmd
+							+ plugin.splitCmd, "#TOKEN#");
+
+					if (bookContent.toLowerCase().contains("@destroywhenused")) {
+						bookContent = bookContent.replace("@destroywhenused",
+								"");
+						commandList += "&4Book will be destroyed when uses=0!\n";
+					}
+					if (bookContent.toLowerCase().contains("@runconsole")) {
+						bookContent = bookContent.replace("@runconsole", "");
+						commandList += "&4Commands will be run as console\n";
+					}
+					if (bookContent.toLowerCase().contains("@hidemessages")) {
+						bookContent = bookContent.replace("@hidemessages", "");
+						commandList += "&4cmdBook Messages will be hidden\n";
+					}
+					// Default Economy
+					int economy_price_use = Configuration.config
+							.getInt("economy.use_price");
+					// Now check for price[] in book
+					regex = Pattern.compile("\\@price\\[(.*?)\\]");
+					regexMatcher = regex.matcher(bookContent);
+					while (regexMatcher.find()) {
 						try {
 							// matched text: regexMatcher.group(i)
 							// match start: regexMatcher.start(i)
 							// match end: regexMatcher.end(i)
-							engine.getBindings(ScriptContext.ENGINE_SCOPE);
-							commandList += "&4'calc("
-									+ regexMatcher.group(x).toString()
-									+ ")' is deprecated!\nUse /cb convert to fix this issue\n";
+
+							economy_price_use = Integer.parseInt(regexMatcher
+									.group(0).replace("@price[", "")
+									.replace("]", ""));
+							bookContent = bookContent.replace(
+									regexMatcher.group(0), "");
+							commandList += "&4You need to pay "
+									+ economy_price_use
+									+ "$ to use this book!\n";
 						} catch (Exception ex) {
 							ex.printStackTrace();
 						}
 					}
-				}
+					// Now check for uses[] in book
+					int uses = -1;
+					regex = Pattern.compile("\\@uses\\[(.*?)\\]");
+					regexMatcher = regex.matcher(bookContent);
+					while (regexMatcher.find()) {
+						try {
+							// matched text: regexMatcher.group(i)
+							// match start: regexMatcher.start(i)
+							// match end: regexMatcher.end(i)
 
-				// Make one string of all those pages
-				bookContent = pageContents[i].toString().replace("\n", "");
-				// Check if bookcontent includes a || in a command
-				bookContent = bookContent.replace(plugin.splitCmd
-						+ plugin.splitCmd, "#TOKEN#");
-
-				if (bookContent.toLowerCase().contains("@destroywhenused")) {
-					bookContent = bookContent.replace("@destroywhenused", "");
-					commandList += "&4Book will be destroyed when uses=0!\n";
-				}
-				if (bookContent.toLowerCase().contains("@runconsole")) {
-					bookContent = bookContent.replace("@runconsole", "");
-					commandList += "&4Commands will be run as console\n";
-				}
-				if (bookContent.toLowerCase().contains("@hidemessages")) {
-					bookContent = bookContent.replace("@hidemessages", "");
-					commandList += "&4cmdBook Messages will be hidden\n";
-				}
-
-				// Now read every letter and search for |
-				for (int j = 1; j < bookContent.length() + 1; j++) {
-					if (bookContent.charAt(j - 1) == seperator.toCharArray()[0]
-							|| bookContent.length() == j) {
-						// Execute command
-						String command = bookContent.substring((j - count), j)
-								.replace(plugin.splitCmd, "");
-						command = command.replace("#TOKEN#", plugin.splitCmd);
-
-						commandList += "&b" + chatColor.stringtodelete(command)
-								+ "\n";
-						count = 0;
+							uses = Integer.parseInt(regexMatcher.group(0)
+									.replace("@uses[", "").replace("]", ""));
+							bookContent = bookContent.replace(
+									regexMatcher.group(0), "");
+							if (uses != 0) {
+								commandList += "&4There are " + uses
+										+ " uses left!\n";
+							} else {
+							}
+						} catch (Exception ex) {
+						}
 					}
-					count += 1; // Add int
-				}
-			}
 
-			// Show commands in the book
-			player.sendMessage(chatColor.stringtodata(cmdbook_info
-					+ book.getTitle() + "\n" + commandList));
-		} else {
+					// Get cooldown
+					regex = Pattern.compile("\\@cooldown\\[(.*?)\\]");
+					regexMatcher = regex.matcher(bookContent);
+					int cooldown = 0;
+					while (regexMatcher.find()) {
+						try {
+							// matched text: regexMatcher.group(i)
+							// match start: regexMatcher.start(i)
+							// match end: regexMatcher.end(i)
+							plugin.logger.info(cmdFormat
+									+ "Cooldown loaded: "
+									+ regexMatcher.group(0)
+											.replace("@cooldown[", "")
+											.replace("]", ""));
+							cooldown = Integer
+									.parseInt(regexMatcher.group(0)
+											.replace("@cooldown[", "")
+											.replace("]", ""));
+							commandList += "&4Cooldown set to " + cooldown
+									+ " minutes\n";
+							bookContent = bookContent.replace(
+									regexMatcher.group(0), "");
+							// Check last used
+							regex = Pattern.compile("\\@lastused\\[(.*?)\\]");
+							regexMatcher = regex.matcher(bookContent);
+							DateFormat dateFormat = new SimpleDateFormat(
+									"yyyy/MM/dd HH:mm:ss");
+							Date lastused = new Date();
+							Date now = new Date();
+							while (regexMatcher.find()) {
+								try {
+									// matched text: regexMatcher.group(i)
+									// match start: regexMatcher.start(i)
+									// match end: regexMatcher.end(i)
+
+									lastused = dateFormat.parse(regexMatcher
+											.group(0).replace("@lastused[", "")
+											.replace("]", ""));
+									bookContent = bookContent.replace(
+											regexMatcher.group(0), "");
+									book = (BookMeta) item.getItemMeta();
+									if ((lastused.getTime() + (cooldown * 60000)) <= now
+											.getTime()) {
+
+									} else {
+										commandList += "&4Book locked till "
+												+ dateFormat
+														.format(((lastused
+																.getTime() + (cooldown * 60000))))
+														.toString() + "\n";
+									}
+								} catch (Exception ex) {
+									ex.printStackTrace();
+								}
+							}
+						} catch (Exception ex) {
+							ex.printStackTrace();
+						}
+					}
+
+					// Economy
+					try {
+						if (Configuration.config.getBoolean("economy.enabled") == false
+								|| plugin.economyFound == false
+								|| plugin.economyFound == false
+								|| plugin.economyFound == false) {
+							// No economy enabled
+						} else {
+							if (plugin.econ.getBalance(player.getName()) >= economy_price_use) {
+								plugin.econ.withdrawPlayer(player.getName(),
+										economy_price_use);
+								// Send message to player
+								player.sendMessage(chatColor
+										.stringtodata(confirm_money.replaceAll(
+												"\\{MONEY\\}",
+												economy_price_use + "")));
+							} else {
+								// No money
+								player.sendMessage(chatColor
+										.stringtodata(error_money.replaceAll(
+												"\\{MONEY\\}",
+												economy_price_use + "")));
+								return;
+							}
+						}
+					} catch (Exception ex) {
+						// Error
+					}
+
+					// Now read every letter and search for |
+					for (int j = 1; j < bookContent.length() + 1; j++) {
+						if (bookContent.charAt(j - 1) == seperator
+								.toCharArray()[0] || bookContent.length() == j) {
+							// Execute command
+							String command = bookContent.substring((j - count),
+									j).replace(plugin.splitCmd, "");
+							command = command.replace("#TOKEN#",
+									plugin.splitCmd);
+
+							commandList += "&b"
+									+ chatColor.stringtodelete(command) + "\n";
+							count = 0;
+						}
+						count += 1; // Add int
+					}
+				}
+
+				// Show commands in the book
+				player.sendMessage(chatColor.stringtodata(cmdbook_info
+						+ book.getTitle() + "\n" + commandList));
+			} else {
+				// The player in not holding a book
+				player.sendMessage(chatColor.stringtodata(error_normalbook));
+				return;
+			}
+		}else{
 			// The player in not holding a book
 			player.sendMessage(chatColor.stringtodata(error_nobook));
 			return;
@@ -194,7 +337,9 @@ public class Book {
 				if (pageContent[0].toString().toLowerCase()
 						.startsWith("[cmdbook]")) {
 					// Check if player has enough money
-					if (Configuration.config.getBoolean("economy.enabled") == false || plugin.economyFound == false || plugin.economyFound == false) {
+					if (Configuration.config.getBoolean("economy.enabled") == false
+							|| plugin.economyFound == false
+							|| plugin.economyFound == false) {
 						// No economy enabled
 						// Commandbook Created :)
 						this.logger.info(cmdFormat + player.getName()
@@ -285,7 +430,9 @@ public class Book {
 					if (player.hasPermission("cmdbook.edit")) {
 						// Player has permisions
 						// Unsign the book
-						if (Configuration.config.getBoolean("economy.enabled") == false || plugin.economyFound == false || plugin.economyFound == false) {
+						if (Configuration.config.getBoolean("economy.enabled") == false
+								|| plugin.economyFound == false
+								|| plugin.economyFound == false) {
 							// No economy enabled
 						} else {
 							if (plugin.econ.getBalance(player.getName()) >= Configuration.config
@@ -341,7 +488,7 @@ public class Book {
 
 	String answer = "";
 
-	@SuppressWarnings("static-access")
+	@SuppressWarnings({ "static-access", "deprecation" })
 	public void performCommands(Player player, ItemStack item) {
 		// PUT THIS INTO EVERY METHOD
 		PluginDescriptionFile pdfFile = plugin.getDescription();
@@ -605,81 +752,167 @@ public class Book {
 			int economy_price_use = Configuration.config
 					.getInt("economy.use_price");
 			// Now check for price[] in book
-			Pattern regex = Pattern
-					.compile("\\@price\\[(.*?)\\]");
+			Pattern regex = Pattern.compile("\\@price\\[(.*?)\\]");
 			Matcher regexMatcher = regex.matcher(bookContent);
 			while (regexMatcher.find()) {
 				try {
 					// matched text: regexMatcher.group(i)
 					// match start: regexMatcher.start(i)
 					// match end: regexMatcher.end(i)
-					plugin.logger.info(cmdFormat + "Price book loaded: " + regexMatcher.group(0).replace("@price[", "").replace("]", ""));
-					economy_price_use = Integer.parseInt(regexMatcher.group(0).replace("@price[", "").replace("]", ""));
-					bookContent = bookContent.replace(regexMatcher.group(0), "");
+					plugin.logger.info(cmdFormat
+							+ "Price book loaded: "
+							+ regexMatcher.group(0).replace("@price[", "")
+									.replace("]", ""));
+					economy_price_use = Integer.parseInt(regexMatcher.group(0)
+							.replace("@price[", "").replace("]", ""));
+					bookContent = bookContent
+							.replace(regexMatcher.group(0), "");
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
 			}
 			// Now check for uses[] in book
 			int uses = -1;
-			regex = Pattern
-					.compile("\\@uses\\[(.*?)\\]");
+			regex = Pattern.compile("\\@uses\\[(.*?)\\]");
 			regexMatcher = regex.matcher(bookContent);
 			while (regexMatcher.find()) {
 				try {
 					// matched text: regexMatcher.group(i)
 					// match start: regexMatcher.start(i)
 					// match end: regexMatcher.end(i)
-					plugin.logger.info(cmdFormat + "Loaded uses of book: " + regexMatcher.group(0).replace("@uses[", "").replace("]", ""));
-					uses = Integer.parseInt(regexMatcher.group(0).replace("@uses[", "").replace("]", ""));
-					bookContent = bookContent.replace(regexMatcher.group(0), "");
-				    BookMeta book = (BookMeta)item.getItemMeta();
-				    if (uses != 0)
-				    {
-					    int nextuse = Integer.parseInt(regexMatcher.group(0).replace("@uses[", "").replace("]", "")) -1;
-					    book.setPage(1, book.getPage(1).replace(regexMatcher.group(0), "@uses[" + nextuse + "]"));
-					    item.setItemMeta(book);
-				    }else{
-				    	if (destroywhenused == true)
-				    	{
-				    		item = null;
-				    		player.setItemInHand(null);
-				    	}
-				    }
+					plugin.logger.info(cmdFormat
+							+ "Loaded uses of book: "
+							+ regexMatcher.group(0).replace("@uses[", "")
+									.replace("]", ""));
+					uses = Integer.parseInt(regexMatcher.group(0)
+							.replace("@uses[", "").replace("]", ""));
+					bookContent = bookContent
+							.replace(regexMatcher.group(0), "");
+					BookMeta book = (BookMeta) item.getItemMeta();
+					if (uses != 0) {
+						int nextuse = Integer.parseInt(regexMatcher.group(0)
+								.replace("@uses[", "").replace("]", "")) - 1;
+						book.setPage(
+								1,
+								book.getPage(1).replace(regexMatcher.group(0),
+										"@uses[" + nextuse + "]"));
+						item.setItemMeta(book);
+					} else {
+						if (destroywhenused == true) {
+							item = null;
+							player.setItemInHand(null);
+						}
+					}
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
 			}
-			
-			if (uses >0 || uses == -1)
-			{
+
+			if (uses > 0 || uses == -1) {
+				// Get cooldown
+				regex = Pattern.compile("\\@cooldown\\[(.*?)\\]");
+				regexMatcher = regex.matcher(bookContent);
+				int cooldown = 0;
+				while (regexMatcher.find()) {
+					try {
+						// matched text: regexMatcher.group(i)
+						// match start: regexMatcher.start(i)
+						// match end: regexMatcher.end(i)
+						plugin.logger.info(cmdFormat
+								+ "Cooldown loaded: "
+								+ regexMatcher.group(0)
+										.replace("@cooldown[", "")
+										.replace("]", ""));
+						cooldown = Integer.parseInt(regexMatcher.group(0)
+								.replace("@cooldown[", "").replace("]", ""));
+						bookContent = bookContent.replace(
+								regexMatcher.group(0), "");
+						// Check last used
+						regex = Pattern.compile("\\@lastused\\[(.*?)\\]");
+						regexMatcher = regex.matcher(bookContent);
+						DateFormat dateFormat = new SimpleDateFormat(
+								"yyyy/MM/dd HH:mm:ss");
+						Date lastused = new Date();
+						Date now = new Date();
+						while (regexMatcher.find()) {
+							try {
+								// matched text: regexMatcher.group(i)
+								// match start: regexMatcher.start(i)
+								// match end: regexMatcher.end(i)
+								plugin.logger.info(cmdFormat
+										+ "Loaded last use of book: "
+										+ regexMatcher.group(0)
+												.replace("@lastused[", "")
+												.replace("]", ""));
+								lastused = dateFormat.parse(regexMatcher
+										.group(0).replace("@lastused[", "")
+										.replace("]", ""));
+								bookContent = bookContent.replace(
+										regexMatcher.group(0), "");
+								BookMeta book = (BookMeta) item.getItemMeta();
+								if ((lastused.getTime() + (cooldown * 60000)) <= now
+										.getTime()) {
+									book.setPage(
+											1,
+											book.getPage(1)
+													.replace(
+															regexMatcher
+																	.group(0),
+															"@lastused["
+																	+ dateFormat
+																			.format(now)
+																	+ "]"));
+									item.setItemMeta(book);
+								} else {
+									player.sendMessage(chatColor.stringtodata(error_wait.replace(
+											"{TIME}",
+											dateFormat
+													.format(((lastused
+															.getTime() + (cooldown * 60000))))
+													.toString())));
+									return;
+								}
+							} catch (Exception ex) {
+								ex.printStackTrace();
+							}
+						}
+					} catch (Exception ex) {
+						ex.printStackTrace();
+					}
+				}
+
 				// Economy
 				try {
-					if (Configuration.config.getBoolean("economy.enabled") == false || plugin.economyFound == false || plugin.economyFound == false || plugin.economyFound == false) {
+					if (Configuration.config.getBoolean("economy.enabled") == false
+							|| plugin.economyFound == false
+							|| plugin.economyFound == false
+							|| plugin.economyFound == false) {
 						// No economy enabled
 					} else {
 						if (plugin.econ.getBalance(player.getName()) >= economy_price_use) {
 							plugin.econ.withdrawPlayer(player.getName(),
 									economy_price_use);
 							// Send message to player
-							player.sendMessage(chatColor.stringtodata(confirm_money
-									.replaceAll("\\{MONEY\\}", economy_price_use + "")));
+							player.sendMessage(chatColor
+									.stringtodata(confirm_money.replaceAll(
+											"\\{MONEY\\}", economy_price_use
+													+ "")));
 						} else {
 							// No money
-							player.sendMessage(chatColor.stringtodata(error_money
-									.replaceAll("\\{MONEY\\}", economy_price_use + "")));
+							player.sendMessage(chatColor
+									.stringtodata(error_money.replaceAll(
+											"\\{MONEY\\}", economy_price_use
+													+ "")));
 							return;
 						}
 					}
 				} catch (Exception ex) {
 					// Error
 				}
-				
-				
 
 				// Check if bookcontent includes a || in a command
-				bookContent = bookContent.replace(
-						plugin.splitCmd + plugin.splitCmd, "#TOKEN#");
+				bookContent = bookContent.replace(plugin.splitCmd
+						+ plugin.splitCmd, "#TOKEN#");
 
 				// Do a quick check to see how many commands need to be stored
 				for (int j = 1; j < bookContent.length() + 1; j++) {
@@ -707,9 +940,10 @@ public class Book {
 						// Execute command
 						try {
 							// Check for calculations
-							String command = bookContent.substring((j - count), j)
-									.replace(plugin.splitCmd, "");
-							command = command.replace("#TOKEN#", plugin.splitCmd);
+							String command = bookContent.substring((j - count),
+									j).replace(plugin.splitCmd, "");
+							command = command.replace("#TOKEN#",
+									plugin.splitCmd);
 							cmd_list[counter] = command;
 							counter += 1;
 						} catch (Exception e) {
@@ -721,8 +955,8 @@ public class Book {
 					// Check for @input
 					if (bookContent.charAt(j - 1) == '@') {
 						// Check if it is an input
-						if (bookContent.substring(j - 1, j + 5).equalsIgnoreCase(
-								"@input")) {
+						if (bookContent.substring(j - 1, j + 5)
+								.equalsIgnoreCase("@input")) {
 							// It is an input
 							String questionUser = "";
 							String inputStr_Replace = "@input";
@@ -780,14 +1014,15 @@ public class Book {
 
 								// Replace input
 								try {
-									plugin.logger.info(cmdFormat + player.getName()
-											+ " input : " + answer);
-									bookContent = bookContent.substring(0, j - 1)
+									plugin.logger.info(cmdFormat
+											+ player.getName() + " input : "
+											+ answer);
+									bookContent = bookContent.substring(0,
+											j - 1)
 											+ answer
-											+ bookContent
-													.substring(j
-															+ inputStr_Replace
-																	.length() - 1);
+											+ bookContent.substring(j
+													+ inputStr_Replace.length()
+													- 1);
 									answer = ""; // Reset
 								} catch (Exception ex) {
 									// Error
@@ -802,8 +1037,8 @@ public class Book {
 					}
 					count += 1; // Add int
 				}
-			}else{
-				
+			} else {
+
 			}
 		}
 
@@ -1022,13 +1257,23 @@ public class Book {
 								this.logger.info(cmdFormat + player.getName()
 										+ " message send: " + message);
 							}
-						} else if (command.toLowerCase().startsWith("$workbench")) {
+						} else if (command.toLowerCase().startsWith(
+								"$workbench")) {
 							if (player.hasPermission("cmdbook.use.workbench")) {
 								player.openWorkbench(player.getLocation(), true);
+
 							}
-						} else if (command.toLowerCase().startsWith("$enchtable")) {
+						} else if (command.toLowerCase().startsWith(
+								"$enchtable")) {
 							if (player.hasPermission("cmdbook.use.enchtable")) {
-								player.openEnchanting(player.getLocation(), true);
+								player.openEnchanting(player.getLocation(),
+										true);
+							}
+						} else if (command.toLowerCase().startsWith("$anvil")) {
+							if (player.hasPermission("cmdbook.use.anvil")) {
+								Inventory GUI = Bukkit.createInventory(player,
+										InventoryType.ANVIL);
+								player.openInventory(GUI);
 							}
 						} else if (command.toLowerCase().startsWith("$chat[")) {
 							// Chat perform
@@ -1093,9 +1338,8 @@ public class Book {
 											+ player.getName()
 											+ " performed chat " + command);
 								}
-							}else
-							{
-								
+							} else {
+
 							}
 						}
 					} catch (Exception e) {

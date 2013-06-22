@@ -1,0 +1,6 @@
+[cmdbook]
+$msg[&2Example Book]|
+$msg[&aCooldown Workbench]|
+@lastused[0000/00/00 00:00:00]
+@cooldown[5]
+$workbench

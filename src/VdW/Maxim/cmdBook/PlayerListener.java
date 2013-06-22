@@ -45,7 +45,7 @@ public class PlayerListener implements Listener {
 	static String error_noread = "&cYou cannot read a &4cmdBook&c!";
 
 	// Confirm messages (Handy for other languages)
-	static String confirm_opening = "&aThis book is protected!";
+	static String confirm_opening = "&2This book is protected!";
 
 	// Get arguments from main class
 	public PlayerListener(cmdBook cmdBook) {
@@ -466,20 +466,25 @@ public class PlayerListener implements Listener {
 				}
 				player.closeInventory();
 			} else {
-				if (book.getDisplayName().startsWith(ChatColor.BLUE + "")) {
-					if (book.getAuthor() == player.getName()
-							&& book.getDisplayName().startsWith(
-									ChatColor.BLUE + "")
-							|| player.hasPermission("cmdbook.readall")) {
-						player.sendMessage(chatColor
-								.stringtodata(confirm_opening));
-					} else if (book.getAuthor() != player.getName()) {
-						player.sendMessage(chatColor
-								.stringtodata(error_permission));
-						player.closeInventory();
-					}
-				} else {
-					// nothing
+				try{
+					if (book.getDisplayName().startsWith(ChatColor.BLUE + "")) {
+						if (book.getAuthor() == player.getName()
+								&& book.getDisplayName().startsWith(
+										ChatColor.BLUE + "")
+								|| player.hasPermission("cmdbook.readall")) {
+							player.sendMessage(chatColor
+									.stringtodata(confirm_opening));
+						} else if (book.getAuthor() != player.getName()) {
+							player.sendMessage(chatColor
+									.stringtodata(error_permission));
+							player.closeInventory();
+						}
+					} else {
+						// nothing
+					}	
+				}catch (Exception e)
+				{
+					// ERROR
 				}
 			}
 		}

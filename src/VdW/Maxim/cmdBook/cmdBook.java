@@ -134,8 +134,9 @@ public class cmdBook extends JavaPlugin {
 		}
 		
 		//Check for updates
-		/*if (Configuration.config.getBoolean("checkUpdates")==true || Configuration.config.getBoolean("autoUpdate")==true)
+		if (Configuration.config.getBoolean("checkUpdates")==true || Configuration.config.getBoolean("autoUpdate")==true)
 		{
+			this.logger.info(cmdFormat + "Checking for updates on dev.bukkit.org ...");
 			this.getServer().getScheduler()
 			.runTaskLaterAsynchronously(this, new Runnable() {
 				public void run() {
@@ -145,7 +146,7 @@ public class cmdBook extends JavaPlugin {
 			}, 0L);	
 		}else{
 			this.logger.warning(cmdFormat + "Automatic updates is turned off!");
-		}*/
+		}
 	}
 
 	@Override

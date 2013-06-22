@@ -37,7 +37,7 @@ public class CommandClass implements CommandExecutor {
 	static String error_nopage = "&cUnable to find that page!";
 
 	// Confirm messages
-	static String confirm_private = "&aYour book has been made private!";
+	static String confirm_private = "&2Your book has been made private!";
 	static String confirm_unprivate = "&2Your book has been made public!";
 	static String confirm_reloaded = "&2[&fcmdBook&2] &aReload complete!";
 
@@ -86,36 +86,35 @@ public class CommandClass implements CommandExecutor {
 						// Show HELP page 1
 						help help = new help(plugin);
 						help.cmdbook_variables_page1(player);
-					}else{
+					} else {
 						argument = args[1];
-						if (argument.equalsIgnoreCase("1"))
-						{
+						if (argument.equalsIgnoreCase("1")) {
 							// Show HELP page 1
 							help help = new help(plugin);
 							help.cmdbook_variables_page1(player);
-						}
-						else if (argument.equalsIgnoreCase("2"))
-						{
+						} else if (argument.equalsIgnoreCase("2")) {
 							// Show HELP page 2
 							help help = new help(plugin);
 							help.cmdbook_variables_page2(player);
-						}
-						else if (argument.equalsIgnoreCase("3"))
-						{
+						} else if (argument.equalsIgnoreCase("3")) {
 							// Show HELP page 3
 							help help = new help(plugin);
 							help.cmdbook_variables_page3(player);
-						}
-						else if (argument.equalsIgnoreCase("4"))
-						{
+						} else if (argument.equalsIgnoreCase("4")) {
 							// Show HELP page 4
 							help help = new help(plugin);
 							help.cmdbook_variables_page4(player);
-						}else{
+						} else if (argument.equalsIgnoreCase("5")) {
+							// Show HELP page 5
+							help help = new help(plugin);
+							help.cmdbook_variables_page5(player);
+						} else {
 							player.sendMessage(chatColor
 									.stringtodata(error_nopage));
 						}
 					}
+				} else if (argument.equalsIgnoreCase("examples")) {
+					
 				} else if (argument.equalsIgnoreCase("convert")) {
 					try {
 						if (player == null) {
@@ -223,7 +222,8 @@ public class CommandClass implements CommandExecutor {
 						logger.info(chatColor.stringtoconsole(confirm_reloaded));
 					} else {
 						if (player.hasPermission("cmdbook.reload")
-								|| (player.isOp() && Configuration.config.getBoolean("opPermissions") == true)) {
+								|| (player.isOp() && Configuration.config
+										.getBoolean("opPermissions") == true)) {
 							Configuration cfg = new Configuration(plugin);
 							cfg.loadYamls();
 							player.sendMessage(chatColor
@@ -243,11 +243,13 @@ public class CommandClass implements CommandExecutor {
 								.stringtodata(error_console));
 					} else {
 						// Check if player has permissions
-						if (player.hasPermission("cmdbook.create") 
-								|| (player.isOp() && Configuration.config.getBoolean("opPermissions") == true)) {
+						if (player.hasPermission("cmdbook.create")
+								|| (player.isOp() && Configuration.config
+										.getBoolean("opPermissions") == true)) {
 							// Start CreateBook
 							Book creator = new Book(plugin);
-							creator.createCmdBook(player,player.getItemInHand());
+							creator.createCmdBook(player,
+									player.getItemInHand());
 						} else {
 							// No permission
 							player.sendMessage(chatColor
@@ -269,7 +271,7 @@ public class CommandClass implements CommandExecutor {
 						if (player.hasPermission("cmdbook.edit")) {
 							// Start CreateBook
 							Book creator = new Book(plugin);
-							creator.editBook(player,player.getItemInHand());
+							creator.editBook(player, player.getItemInHand());
 						} else {
 							// No permission
 							player.sendMessage(chatColor
@@ -287,7 +289,7 @@ public class CommandClass implements CommandExecutor {
 						if (player.hasPermission("cmdbook.info")) {
 							// Start CreateBook
 							Book creator = new Book(plugin);
-							creator.infocmdBook(player,player.getItemInHand());
+							creator.infocmdBook(player, player.getItemInHand());
 						} else {
 							// No permission
 							player.sendMessage(chatColor

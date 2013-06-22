@@ -50,13 +50,9 @@ public class updater {
 					new InputStreamReader(is));
 			// Get version as string with .=-
 			String versionStr = pdfFile.getVersion().replace(".", "-");
-			String craftbookV = Bukkit.getBukkitVersion().substring(0,
-					Bukkit.getBukkitVersion().indexOf("-"));
-
 			String line = null;
-			String regExp = "<a href=\"(/server-mods/" + devName + "/files/"
-					+ "(0|(\\+)?([1-9]{1}[0-9]{0,1}|[1]{1}[0-9]{0,2}|[2]{1}([0-4]"
-					+ "{1}[0-9]{1}|[5]{1}[0-5]{1}))))-" + devFileSplit + "-";
+			String regExp = "<a href=\"/bukkit-plugins/" + devName + "/files/"
+					+ "[1-9][1-9]-" + devFileSplit + "-(.?-.?-.?)";
 			Pattern p = Pattern.compile(regExp, Pattern.CASE_INSENSITIVE);
 			while ((line = reader.readLine()) != null) {
 				Matcher m = p.matcher(line);
