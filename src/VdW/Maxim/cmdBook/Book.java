@@ -488,7 +488,6 @@ public class Book {
 
 	String answer = "";
 
-	@SuppressWarnings({ "static-access", "deprecation" })
 	public void performCommands(Player player, ItemStack item) {
 		// PUT THIS INTO EVERY METHOD
 		PluginDescriptionFile pdfFile = plugin.getDescription();
@@ -1001,7 +1000,8 @@ public class Book {
 
 								while (answer == "") {
 									try {
-										Thread.currentThread().sleep(10);
+										Thread.currentThread();
+										Thread.sleep(10);
 									} catch (InterruptedException e) {
 									}
 								}
@@ -1100,7 +1100,8 @@ public class Book {
 
 									while (answer == "") {
 										try {
-											Thread.currentThread().sleep(10);
+											Thread.currentThread();
+											Thread.sleep(10);
 										} catch (InterruptedException e) {
 										}
 									}
@@ -1228,7 +1229,8 @@ public class Book {
 							}
 							this.logger.info(cmdFormat + player.getName()
 									+ " sleeping " + timewait);
-							Thread.currentThread().sleep(timewait);
+							Thread.currentThread();
+							Thread.sleep(timewait);
 						} else if (command.toLowerCase().startsWith("$effect[")) {
 							if (player.hasPermission("cmdbook.use.effect")) {
 								// Private message

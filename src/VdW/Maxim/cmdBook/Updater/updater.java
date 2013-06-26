@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginDescriptionFile;
 
 import VdW.Maxim.cmdBook.cmdBook;
@@ -43,7 +42,7 @@ public class updater {
 		// --------------------------
 
 		try {
-			URL url = new URL("http://dev.bukkit.org/server-mods/" + devName);
+			URL url = new URL("http://dev.bukkit.org/bukkit-mods/" + devName);
 			InputStream is = url.openConnection().getInputStream();
 
 			BufferedReader reader = new BufferedReader(
@@ -52,7 +51,7 @@ public class updater {
 			String versionStr = pdfFile.getVersion().replace(".", "-");
 			String line = null;
 			String regExp = "<a href=\"/bukkit-plugins/" + devName + "/files/"
-					+ "[1-9][1-9]-" + devFileSplit + "-(.?-.?-.?)";
+					+ "[0-9][0-9]-" + devFileSplit + "-(.?-.?-.?)";
 			Pattern p = Pattern.compile(regExp, Pattern.CASE_INSENSITIVE);
 			while ((line = reader.readLine()) != null) {
 				Matcher m = p.matcher(line);

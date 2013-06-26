@@ -1,0 +1,6 @@
+[cmdbook]
+@runconsole
+@hidemessages
+$msg[&2Example Book]|
+$msg[&aTeleport book (compass)]|
+/tp $player $losx $calc[$losy+1] &losz
