@@ -26,8 +26,8 @@ import net.milkbowl.vault.economy.Economy;
 public class cmdBook extends JavaPlugin {
 	// Create global variables
 	public final Logger logger = Logger.getLogger("Minecraft"); // Console
-	public cmdBook plugin = this; // Plugin will now refer to cmdBook
-	private CommandClass CommandListener; // Wait for commands in a different
+	public static cmdBook plugin; // Plugin will now refer to cmdBook
+	private CommandClass commandlistener; // Wait for commands in a different
 											// class
 	public static int config_version = 6; // Configuration version
 	public static int cb_buildversion = 152; // The craftbukkit version, this app was build for
@@ -48,6 +48,7 @@ public class cmdBook extends JavaPlugin {
 		String cmdFormat = "[" + pdfFile.getName() + "] ";
 		// --------------------------
 
+		plugin = this;
 		// This function will be started when the plugin is Enabled
 		// Load everything here
 
@@ -79,10 +80,10 @@ public class cmdBook extends JavaPlugin {
 
 		// Now start Command Listener - This will wait for commands
 		this.logger.info(cmdFormat + "Starting command listener...");
-		CommandListener = new CommandClass(this);
+		commandlistener = new CommandClass(this);
 		// List all commands that have to be heard by the Command Listener
 		try{
-			getCommand("cb").setExecutor(CommandListener);	
+			getCommand("cb").setExecutor(commandlistener);	
 		}catch (Exception ex){
 			// Error while enabling the commands
 			// Do not show this cuz its a compatibility bug
@@ -155,16 +156,17 @@ public class cmdBook extends JavaPlugin {
 	}
 	
 	// Economy
-	 private boolean setupEconomy() {
-	        if (getServer().getPluginManager().getPlugin("Vault") == null) {
-	            return false;
-	        }
-	        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
-	        if (rsp == null) {
-	            return false;
-	        }
-	        econ = rsp.getProvider();
-	        return econ != null;
-	    }
+	private boolean setupEconomy() {
+		if (getServer().getPluginManager().getPlugin("Vault") == null) {
+			return false;
+		}
+		RegisteredServiceProvider<Economy> rsp = getServer()
+				.getServicesManager().getRegistration(Economy.class);
+		if (rsp == null) {
+			return false;
+		}
+		econ = rsp.getProvider();
+		return econ != null;
+	}
 
 }

@@ -1,6 +1,0 @@
-[cmdbook]
-@runconsole
-@hidemessages
-$msg[&2Example Book]|
-$msg[&aTeleport to random location]|
-/tp $player $script[var output = Math.floor(Math.random()*2001) + " " + 65 + " " + Math.floor(Math.random()*2001)]

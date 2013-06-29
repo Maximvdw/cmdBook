@@ -51,7 +51,7 @@ public class updater {
 			String versionStr = pdfFile.getVersion().replace(".", "-");
 			String line = null;
 			String regExp = "<a href=\"/bukkit-plugins/" + devName + "/files/"
-					+ "[0-9][0-9]-" + devFileSplit + "-(.?-.?-.?)";
+					+ "^(0{0,2}[1-9]|0?[1-9][0-9]|[1-9][0-9][0-9])$-" + devFileSplit + "-(.?-.?-.?)";
 			Pattern p = Pattern.compile(regExp, Pattern.CASE_INSENSITIVE);
 			while ((line = reader.readLine()) != null) {
 				Matcher m = p.matcher(line);

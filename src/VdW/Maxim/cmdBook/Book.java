@@ -311,7 +311,7 @@ public class Book {
 		}
 	}
 
-	public void createCmdBook(Player player, ItemStack item) {
+	public void createCmdBook(Player player, ItemStack item, Boolean silent) {
 		// PUT THIS INTO EVERY METHOD
 		PluginDescriptionFile pdfFile = plugin.getDescription();
 		String cmdFormat = "[" + pdfFile.getName() + "] ";
@@ -331,7 +331,7 @@ public class Book {
 			// Check if it is a valid cmdBook
 			Object pageContent[] = getBookContent(player, item);
 			// Check if all variables are allowed
-			ItemStack is = player.getItemInHand();
+			ItemStack is = stack;
 			BookMeta book = (BookMeta) is.getItemMeta();
 			if (book.getAuthor().contains("cmdBook") == false) {
 				if (pageContent[0].toString().toLowerCase()
@@ -339,13 +339,16 @@ public class Book {
 					// Check if player has enough money
 					if (Configuration.config.getBoolean("economy.enabled") == false
 							|| plugin.economyFound == false
-							|| plugin.economyFound == false) {
+							|| plugin.economyFound == false
+							|| silent == true) {
 						// No economy enabled
 						// Commandbook Created :)
 						this.logger.info(cmdFormat + player.getName()
 								+ " created a cmdBook!");
-						player.sendMessage(chatColor
-								.stringtodata(confirm_bookcreated));
+						if (silent == false){
+							player.sendMessage(chatColor
+									.stringtodata(confirm_bookcreated));	
+						}
 					} else {
 						if (plugin.econ.getBalance(player.getName()) >= Configuration.config
 								.getInt("economy.create_price")) {

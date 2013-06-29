@@ -21,7 +21,7 @@ public class ReadExample {
 		String cmdFormat = "[" + pdfFile.getName() + "] ";
 		// --------------------------
 		
-		InputStream stream = ReadExample.class.getResourceAsStream("/example_" + id + ".txt");
+		InputStream stream = cmdBook.plugin.getResource("example_" + id + ".txt");
 		if (stream != null)
 		{
 			try {

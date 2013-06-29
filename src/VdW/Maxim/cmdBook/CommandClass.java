@@ -22,6 +22,7 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.PluginDescriptionFile;
 
+import VdW.Maxim.cmdBook.Utils.GiveExample;
 import VdW.Maxim.cmdBook.Utils.ReadExample;
 
 public class CommandClass implements CommandExecutor {
@@ -121,22 +122,16 @@ public class CommandClass implements CommandExecutor {
 						}
 					}
 				} else if (argument.equalsIgnoreCase("examples")) {
-					try{
-						ItemStack is = new ItemStack(Material.WRITTEN_BOOK);
-						BookMeta bookM = (BookMeta)is.getItemMeta();
-						String data = ReadExample.getExample(1);
-						bookM.addPage(data);
-						bookM.setAuthor(player.getName());
-						bookM.setTitle("Example " + "1");
-						
-					    is.setItemMeta(bookM);
-						// Start CreateBook
-						//Book creator = new Book(plugin);
-					//	creator.createCmdBook(player,
-						//		is);
-					    player.getInventory().addItem(is);
-					}catch(Exception ex){
-						ex.printStackTrace();
+					if (player.hasPermission("cmdbook.examples"))
+					{
+						GiveExample.example(1,player);
+						GiveExample.example(2,player);
+						GiveExample.example(3,player);
+						GiveExample.example(4,player);
+					} else {
+						// No permission
+						player.sendMessage(chatColor
+								.stringtodata(error_permission));
 					}
 				} else if (argument.equalsIgnoreCase("convert")) {
 					try {
@@ -272,7 +267,7 @@ public class CommandClass implements CommandExecutor {
 							// Start CreateBook
 							Book creator = new Book(plugin);
 							creator.createCmdBook(player,
-									player.getItemInHand());
+									player.getItemInHand(),false);
 						} else {
 							// No permission
 							player.sendMessage(chatColor
