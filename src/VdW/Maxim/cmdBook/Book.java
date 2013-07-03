@@ -1479,16 +1479,39 @@ public class Book {
 	}
 
 	private Player getTarget(Player player) {
-		for (Player onlinePlayer : plugin.getServer().getOnlinePlayers()) {
-			Entity passenger = onlinePlayer.getPassenger();
-
-			if (passenger instanceof Player
-					&& passenger.getEntityId() == player.getEntityId()) {
-				return onlinePlayer;
-			}
-		}
-
-		return null;
+ List<Entity> nearbyE = player.getNearbyEntities(20, 20, 20);
+        ArrayList<Player> nearPlayers = new ArrayList<Player>();
+        for (Entity e : nearbyE) {
+            if (e instanceof Player) {
+                nearPlayers.add((Player) e);
+            }
+        }
+        Player target = null;
+        BlockIterator bItr = new BlockIterator(player, 20);
+        Block block;
+        Location loc;
+        int bx, by, bz;
+        double ex, ey, ez;
+        while (bItr.hasNext()) {
+ 
+            block = bItr.next();
+            bx = block.getX();
+            by = block.getY();
+            bz = block.getZ();
+            for (Player e : nearPlayers) {
+                loc = e.getLocation();
+                ex = loc.getX();
+                ey = loc.getY();
+                ez = loc.getZ();
+                if ((bx - .75 <= ex && ex <= bx + 1.75) && (bz - .75 <= ez && ez <= bz + 1.75) && (by - 1 <= ey && ey <= by + 2.5)) {
+                    target = e;
+                    break;
+ 
+                }
+            }
+ 
+        }
+        return target;
 	}
 
 	public Object[] getBookContent(Player player, ItemStack item) {
