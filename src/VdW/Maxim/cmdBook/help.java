@@ -88,7 +88,8 @@ public class help extends JavaPlugin {
 	static String cmdbook_variables_page5_str = "&6----------[ cmdBook Variables ]----------\n"
 			+ "&1Page 5 of 5\n"
 			+ "&e$workbench &f- Show the crafting table GUI\n"
-			+ "&e$enchtable &f- Show the enchantmet table GUI";
+			+ "&e$enchtable &f- Show the enchantmet table GUI\n"
+			+ "&e@name[namehere] &f- Give the book a permission name";
 
 	public void cmdbook_help(Player player) {
 		// PUT THIS INTO EVERY METHOD

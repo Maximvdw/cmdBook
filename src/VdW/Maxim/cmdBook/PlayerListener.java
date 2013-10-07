@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;

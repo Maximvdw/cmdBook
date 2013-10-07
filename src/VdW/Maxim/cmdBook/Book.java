@@ -2,6 +2,7 @@ package VdW.Maxim.cmdBook;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +18,9 @@ import javax.script.ScriptEngineManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Effect;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.conversations.Conversation;
 import org.bukkit.conversations.ConversationAbandonedEvent;
 import org.bukkit.conversations.ConversationAbandonedListener;
@@ -29,6 +32,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.util.BlockIterator;
 
 import VdW.Maxim.cmdBook.cmdBook;
 
@@ -142,6 +146,28 @@ public class Book {
 						bookContent = bookContent.replace("@hidemessages", "");
 						commandList += "&4cmdBook Messages will be hidden\n";
 					}
+			
+					// Check permissions
+					regex = Pattern.compile("\\@name\\[(.*?)\\]");
+					regexMatcher = regex.matcher(bookContent);
+					String name = "";
+					while (regexMatcher.find()) {
+						try {
+							// matched text: regexMatcher.group(i)
+							// match start: regexMatcher.start(i)
+							// match end: regexMatcher.end(i)
+
+							name = regexMatcher
+									.group(0).replace("@name[", "")
+									.replace("]", "");
+							bookContent = bookContent
+									.replace(regexMatcher.group(0), "");
+							commandList += "&aBook name: &f" + name + "\n";
+						} catch (Exception ex) {
+							ex.printStackTrace();
+						}
+					}
+					
 					// Default Economy
 					int economy_price_use = Configuration.config
 							.getInt("economy.use_price");
@@ -244,6 +270,7 @@ public class Book {
 									ex.printStackTrace();
 								}
 							}
+							
 						} catch (Exception ex) {
 							ex.printStackTrace();
 						}
@@ -553,9 +580,6 @@ public class Book {
 				if (player.hasPermission("cmdbook.use.player")) {
 					bookContent = bookContent.replace("$player",
 							player.getName());
-				} else {
-					// No permissions
-					player.sendMessage(chatColor.stringtodata(error_permission));
 				}
 			} catch (Exception ex) {
 			}
@@ -563,9 +587,6 @@ public class Book {
 				if (player.hasPermission("cmdbook.use.targetplayer")) {
 					bookContent = bookContent.replace("$targetplayer",
 							getTarget(player).getName());
-				} else {
-					// No permissions
-					player.sendMessage(chatColor.stringtodata(error_permission));
 				}
 			} catch (Exception ex) {
 			}
@@ -573,9 +594,6 @@ public class Book {
 				if (player.hasPermission("cmdbook.use.health")) {
 					bookContent = bookContent.replace("$health",
 							"" + player.getHealth());
-				} else {
-					// No permissions
-					player.sendMessage(chatColor.stringtodata(error_permission));
 				}
 			} catch (Exception ex) {
 			}
@@ -583,9 +601,6 @@ public class Book {
 				if (player.hasPermission("cmdbook.use.lvl")) {
 					bookContent = bookContent.replace("$lvl",
 							"" + player.getLevel());
-				} else {
-					// No permissions
-					player.sendMessage(chatColor.stringtodata(error_permission));
 				}
 			} catch (Exception ex) {
 			}
@@ -593,9 +608,6 @@ public class Book {
 				if (player.hasPermission("cmdbook.use.targetlvl")) {
 					bookContent = bookContent.replace("$targetlvl", ""
 							+ getTarget(player).getLevel());
-				} else {
-					// No permissions
-					player.sendMessage(chatColor.stringtodata(error_permission));
 				}
 			} catch (Exception ex) {
 			}
@@ -603,9 +615,6 @@ public class Book {
 				if (player.hasPermission("cmdbook.use.hunger")) {
 					bookContent = bookContent.replace("$hunger",
 							"" + player.getFoodLevel());
-				} else {
-					// No permissions
-					player.sendMessage(chatColor.stringtodata(error_permission));
 				}
 			} catch (Exception ex) {
 			}
@@ -613,9 +622,6 @@ public class Book {
 				if (player.hasPermission("cmdbook.use.targethunger")) {
 					bookContent = bookContent.replace("$targethunger", ""
 							+ getTarget(player).getFoodLevel());
-				} else {
-					// No permissions
-					player.sendMessage(chatColor.stringtodata(error_permission));
 				}
 			} catch (Exception ex) {
 			}
@@ -623,9 +629,6 @@ public class Book {
 				if (player.hasPermission("cmdbook.use.killer")) {
 					bookContent = bookContent.replace("$killer",
 							"" + player.getKiller());
-				} else {
-					// No permissions
-					player.sendMessage(chatColor.stringtodata(error_permission));
 				}
 			} catch (Exception ex) {
 			}
@@ -633,9 +636,6 @@ public class Book {
 				if (player.hasPermission("cmdbook.use.targetkiller")) {
 					bookContent = bookContent.replace("$targetkiller", ""
 							+ player.getKiller());
-				} else {
-					// No permissions
-					player.sendMessage(chatColor.stringtodata(error_permission));
 				}
 			} catch (Exception ex) {
 			}
@@ -643,9 +643,6 @@ public class Book {
 				if (player.hasPermission("cmdbook.use.xpos")) {
 					bookContent = bookContent.replace("$xpos", ""
 							+ player.getLocation().getX());
-				} else {
-					// No permissions
-					player.sendMessage(chatColor.stringtodata(error_permission));
 				}
 			} catch (Exception ex) {
 			}
@@ -653,9 +650,6 @@ public class Book {
 				if (player.hasPermission("cmdbook.use.ypos")) {
 					bookContent = bookContent.replace("$ypos", ""
 							+ player.getLocation().getY());
-				} else {
-					// No permissions
-					player.sendMessage(chatColor.stringtodata(error_permission));
 				}
 			} catch (Exception ex) {
 			}
@@ -663,9 +657,6 @@ public class Book {
 				if (player.hasPermission("cmdbook.use.zpos")) {
 					bookContent = bookContent.replace("$zpos", ""
 							+ player.getLocation().getZ());
-				} else {
-					// No permissions
-					player.sendMessage(chatColor.stringtodata(error_permission));
 				}
 			} catch (Exception ex) {
 			}
@@ -673,9 +664,6 @@ public class Book {
 				if (player.hasPermission("cmdbook.use.targetxpos")) {
 					bookContent = bookContent.replace("$targetxpos", ""
 							+ getTarget(player).getLocation().getX());
-				} else {
-					// No permissions
-					player.sendMessage(chatColor.stringtodata(error_permission));
 				}
 			} catch (Exception ex) {
 			}
@@ -683,9 +671,6 @@ public class Book {
 				if (player.hasPermission("cmdbook.use.targetypos")) {
 					bookContent = bookContent.replace("$targetypos", ""
 							+ getTarget(player).getLocation().getY());
-				} else {
-					// No permissions
-					player.sendMessage(chatColor.stringtodata(error_permission));
 				}
 			} catch (Exception ex) {
 			}
@@ -693,9 +678,6 @@ public class Book {
 				if (player.hasPermission("cmdbook.use.targetzpos")) {
 					bookContent = bookContent.replace("$targetzpos", ""
 							+ getTarget(player).getLocation().getZ());
-				} else {
-					// No permissions
-					player.sendMessage(chatColor.stringtodata(error_permission));
 				}
 			} catch (Exception ex) {
 			}
@@ -703,9 +685,6 @@ public class Book {
 				if (player.hasPermission("cmdbook.use.losx")) {
 					bookContent = bookContent.replace("$losx", ""
 							+ player.getTargetBlock(null, 200).getX());
-				} else {
-					// No permissions
-					player.sendMessage(chatColor.stringtodata(error_permission));
 				}
 			} catch (Exception ex) {
 			}
@@ -713,9 +692,6 @@ public class Book {
 				if (player.hasPermission("cmdbook.use.losy")) {
 					bookContent = bookContent.replace("$losy", ""
 							+ player.getTargetBlock(null, 200).getY());
-				} else {
-					// No permissions
-					player.sendMessage(chatColor.stringtodata(error_permission));
 				}
 			} catch (Exception ex) {
 			}
@@ -723,9 +699,6 @@ public class Book {
 				if (player.hasPermission("cmdbook.use.losz")) {
 					bookContent = bookContent.replace("$losz", ""
 							+ player.getTargetBlock(null, 200).getZ());
-				} else {
-					// No permissions
-					player.sendMessage(chatColor.stringtodata(error_permission));
 				}
 			} catch (Exception ex) {
 			}
@@ -733,9 +706,6 @@ public class Book {
 				if (player.hasPermission("cmdbook.use.xp")) {
 					bookContent = bookContent.replace("$xp",
 							"" + player.getExp());
-				} else {
-					// No permissions
-					player.sendMessage(chatColor.stringtodata(error_permission));
 				}
 			} catch (Exception ex) {
 			}
@@ -743,9 +713,6 @@ public class Book {
 				if (player.hasPermission("cmdbook.use.targetxp")) {
 					bookContent = bookContent.replace("$targetxp", ""
 							+ getTarget(player).getExp());
-				} else {
-					// No permissions
-					player.sendMessage(chatColor.stringtodata(error_permission));
 				}
 			} catch (Exception ex) {
 			}
@@ -773,6 +740,31 @@ public class Book {
 					ex.printStackTrace();
 				}
 			}
+			
+			// Check permissions
+			regex = Pattern.compile("\\@name\\[(.*?)\\]");
+			regexMatcher = regex.matcher(bookContent);
+			String name = "";
+			while (regexMatcher.find()) {
+				try {
+					// matched text: regexMatcher.group(i)
+					// match start: regexMatcher.start(i)
+					// match end: regexMatcher.end(i)
+
+					name = regexMatcher
+							.group(0).replace("@name[", "")
+							.replace("]", "");
+					bookContent = bookContent
+							.replace(regexMatcher.group(0), "");
+					if (!player.hasPermission("cmdbook.book." + name)){
+						player.sendMessage(chatColor.stringtodata("&cNo permissions for book '" + name + "'"));
+						return;
+					}
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			}
+			
 			// Now check for uses[] in book
 			int uses = -1;
 			regex = Pattern.compile("\\@uses\\[(.*?)\\]");
