@@ -83,12 +83,28 @@ public class cmdBook extends JavaPlugin {
 		commandlistener = new CommandClass(this);
 		// List all commands that have to be heard by the Command Listener
 		try{
-			getCommand("cb").setExecutor(commandlistener);	
+			getCommand("cb").setExecutor(commandlistener);
 		}catch (Exception ex){
 			// Error while enabling the commands
 			// Do not show this cuz its a compatibility bug
+			this.logger.info(cmdFormat + "/cb command already used!");
 		}
-		this.logger.info(cmdFormat + "Command listener loaded!");
+		try{
+			getCommand("cbook").setExecutor(commandlistener);	
+		}catch (Exception ex){
+			// Error while enabling the commands
+			// Do not show this cuz its a compatibility bug
+			this.logger.info(cmdFormat + "/cbook command already used!");
+		}
+		try{
+			getCommand("cmdbook").setExecutor(commandlistener);	
+		}catch (Exception ex){
+			// Error while enabling the commands
+			// Do not show this cuz its a compatibility bug
+			this.logger.info(cmdFormat + "/cmdbook command already used!");
+		}
+		
+		this.logger.info(cmdFormat + "Command listeners loaded!");
 
 		// Load Metrics
 		try {

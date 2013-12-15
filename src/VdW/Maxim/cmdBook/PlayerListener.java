@@ -11,8 +11,6 @@ import java.util.logging.Logger;
 
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
-
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,6 +20,7 @@ import org.bukkit.inventory.meta.BookMeta;
 
 import VdW.Maxim.cmdBook.Metrics.Metrics;
 import VdW.Maxim.cmdBook.Metrics.IncrementalPlotter;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -69,6 +68,7 @@ public class PlayerListener implements Listener {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		final Player player = event.getPlayer();

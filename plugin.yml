@@ -1,12 +1,13 @@
 name: cmdBook
 main: VdW.Maxim.cmdBook.cmdBook
-version: 1.4.3
+version: 1.4.5
 website: http://dev.bukkit.org/server-mods/cmdBook/
 author: Maximvdw
 description: Execute multiple commands in a book
 commands:
-  cb:
+  cbook:
     description: Utilize the plugin
+    alias: cb
 permissions:
     cmdbook.administrator:
         description: Administrators can do anything

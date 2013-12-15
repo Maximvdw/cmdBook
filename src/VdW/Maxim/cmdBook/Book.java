@@ -78,6 +78,7 @@ public class Book {
 	static String cmdbook_info = "&6----[ cmdBook Info ]----\n"
 			+ "&aBook Title: &f";
 
+	@SuppressWarnings("deprecation")
 	public void infocmdBook(Player player, ItemStack item) {
 		// PUT THIS INTO EVERY METHOD
 		PluginDescriptionFile pdfFile = plugin.getDescription();
@@ -338,6 +339,7 @@ public class Book {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public void createCmdBook(Player player, ItemStack item, Boolean silent) {
 		// PUT THIS INTO EVERY METHOD
 		PluginDescriptionFile pdfFile = plugin.getDescription();
@@ -425,6 +427,7 @@ public class Book {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public void editBook(Player player, ItemStack item) {
 		// PUT THIS INTO EVERY METHOD
 		PluginDescriptionFile pdfFile = plugin.getDescription();
@@ -518,6 +521,7 @@ public class Book {
 
 	String answer = "";
 
+	@SuppressWarnings("deprecation")
 	public void performCommands(Player player, ItemStack item) {
 		// PUT THIS INTO EVERY METHOD
 		PluginDescriptionFile pdfFile = plugin.getDescription();
@@ -1375,6 +1379,7 @@ public class Book {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public void convertBook(Player player) {
 		// PUT THIS INTO EVERY METHOD
 		PluginDescriptionFile pdfFile = plugin.getDescription();
